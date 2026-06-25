@@ -35,6 +35,11 @@ app.use(
   require("./routes/skillRoutes")
 );
 
+app.use(
+  "/api/search", 
+  require("./routes/searchRoutes")
+);
+
 const PORT =
   process.env.PORT || 5000;
 

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.js");
-
+//checks whether user is logged in using jwt token or not
 const protect = async (req, res, next) => {
   try {
     let token;
@@ -34,7 +34,21 @@ const protect = async (req, res, next) => {
     });
   }
 };
+//checks whether the logged in user has permission based on role
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied for this role",
+      });
+    }
+    next();
+  };
+};
 
 module.exports = {
   protect,
+  authorizeRoles,
 };
+
+

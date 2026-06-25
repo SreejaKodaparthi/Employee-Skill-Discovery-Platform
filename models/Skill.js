@@ -11,6 +11,7 @@ const skillSchema = new mongoose.Schema(
     skillName: {
       type: String,
       required: true,
+      trim: true,
     },
 
     category: {
@@ -19,6 +20,7 @@ const skillSchema = new mongoose.Schema(
         "technical",
         "soft",
       ],
+      required: true,
     },
 
     proficiencyLevel: {
@@ -29,9 +31,25 @@ const skillSchema = new mongoose.Schema(
         "advanced",
         "expert",
       ],
+      required: true,
     },
 
     yearsOfExperience: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    source: {
+      type: String,
+      enum: [
+        "self",
+        "resume",
+        "endorsed",
+      ],
+      default: "self",
+    },
+
+    endorsementCount: {
       type: Number,
       default: 0,
     },
