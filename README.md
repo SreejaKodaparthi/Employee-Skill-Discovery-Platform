@@ -581,19 +581,20 @@ Supported Parameters
 
 ---
 
-# Ranking Logic
+## Employee Ranking
 
-Employees are ranked using
+Search results are ranked using the following formula:
 
-```
-Match Score
+Match Score =
+Skill Score + Skill Coverage Bonus + Certification Bonus
 
-=
+Where:
 
-Proficiency Score
-+ Years of Experience
-+ Endorsements
-+ Resume Source Bonus
+- **Skill Score** = Skill Proficiency + Years of Experience + Endorsements + Resume Source Weight
+- **Skill Coverage Bonus** = Additional score for matching more of the requested skills
+- **Certification Bonus** = Additional score for matching the requested certification(s)
+
+Employees with higher Match Scores are ranked higher in the search results.
 ```
 
 Proficiency Mapping
