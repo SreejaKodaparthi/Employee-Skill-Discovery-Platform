@@ -156,25 +156,6 @@ Supports
 
 ---
 
-## Employee Ranking
-
-Search results are ranked using
-
-```
-Match Score
-
-=
-
-Skill Proficiency Score
-+ Years of Experience
-+ Endorsements
-+ Resume Source Weight
-```
-
-Higher score indicates better employee suitability.
-
----
-
 # Technology Stack
 
 ## Backend
