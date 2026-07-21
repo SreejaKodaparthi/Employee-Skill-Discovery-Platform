@@ -566,6 +566,10 @@ Supported Parameters
 ## Skill Gap Reports
 
 ```
+POST /api/role-requirements
+```
+
+```
 GET /api/skill-gap/:employeeId/:roleId
 ```
 
