@@ -562,6 +562,13 @@ Supported Parameters
 
 ---
 
+
+## Skill Gap Reports
+
+```
+GET /api/skill-gap/:employeeId/:roleId
+```
+
 ## Employee Ranking
 
 Search results are ranked using the following formula:

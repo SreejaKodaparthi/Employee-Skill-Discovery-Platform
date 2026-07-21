@@ -13,6 +13,8 @@ const analyticsRoutes = require(
   "./routes/analyticsRoutes"
 );
 const skillCatalogRoutes = require("./routes/skillCatalogRoutes");
+const roleRequirementRoutes = require("./routes/roleRequirementRoutes");
+const skillGapRoutes = require("./routes/skillGapRoutes");
 console.log("analyticsRoutes:", analyticsRoutes);
 console.log("skillCatalogRoutes:", skillCatalogRoutes);
 dotenv.config();
@@ -45,37 +47,17 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.use(
-  "/api/auth",
-  require("./routes/authRoutes")
-);
-
-app.use(
-  "/api/profile",
-  require("./routes/profileRoutes")
-);
-
-app.use(
-  "/api/skills",
-  require("./routes/skillRoutes")
-);
-
-app.use(
-  "/api/search", 
-  require("./routes/searchRoutes")
-);
+app.use("/api/auth",require("./routes/authRoutes"));
+app.use("/api/profile",require("./routes/profileRoutes"));
+app.use("/api/skills",require("./routes/skillRoutes"));
+app.use("/api/search", require("./routes/searchRoutes"));
 //neww---
 app.use("/api/resume", resumeRoutes);
 app.use("/api/certifications", certificationRoutes);
-app.use(
-  "/api/analytics",
-  analyticsRoutes
-);
-app.use(
-  "/api/skill-catalog",
-  skillCatalogRoutes
-);
-
+app.use("/api/analytics",analyticsRoutes);
+app.use("/api/skill-catalog",skillCatalogRoutes);
+app.use("/api/roles", roleRequirementRoutes);
+app.use("/api/skill-gap", skillGapRoutes);
 const PORT =
   process.env.PORT || 5000;
 
