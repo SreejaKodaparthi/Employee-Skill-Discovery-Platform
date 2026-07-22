@@ -2,7 +2,7 @@ const User = require("../models/User");
 const Skill = require("../models/Skill");
 const EmployeeProfile = require("../models/EmployeeProfile");
 const Certification = require("../models/Certification");
-
+const calculateTrustScore = require("../utils/trustScore");
 const {
   PROFICIENCY_SCORES,
   escapeRegex,
@@ -533,6 +533,10 @@ const advancedEmployeeSearch = async (req, res) => {
           data.skillScore +
           coverageBonus +
           certificationBonus;
+        const trustScore = calculateTrustScore({
+           matchedSkills: data.matchedSkills,
+            certifications,
+          });
 
         return {
           employee: userMap.get(userId),
@@ -541,6 +545,7 @@ const advancedEmployeeSearch = async (req, res) => {
           matchedSkills: data.matchedSkills,
           certifications,
           matchedSkillCount,
+          trustScore,
           requestedSkillCount:
             requestedSkills.length,
           matchPercentage:

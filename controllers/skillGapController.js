@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Skill = require("../models/Skill");
 const RoleRequirement = require("../models/RoleRequirement");
+const generateRecommendation =require("../services/groqService");
 
 const normalize = (skill) =>
   skill.trim().toLowerCase();
@@ -65,6 +66,35 @@ const generateSkillGapReport = async (req, res) => {
               requiredSkills.length) *
               100
           );
+    let aiRecommendation = {};
+
+try {
+
+    const aiResponse =
+    await generateRecommendation({
+
+        employeeName: employee.name,
+
+        roleName: role.roleName,
+
+        matchedSkills,
+
+        missingSkills,
+
+        extraSkills,
+
+        matchPercentage,
+
+    });
+
+    aiRecommendation =
+    JSON.parse(aiResponse);
+
+}
+catch (error) {
+    console.error("❌ AI Error:", error);
+    console.error(error.stack);
+}
 
     return res.status(200).json({
       success: true,
@@ -89,6 +119,7 @@ const generateSkillGapReport = async (req, res) => {
       extraSkills,
 
       matchPercentage,
+      aiRecommendation
     });
   } catch (error) {
     console.error(error);

@@ -4,7 +4,7 @@ dns.setServers(['1.1.1.1','8.8.8.8']);
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-
+dotenv.config();
 const connectDB = require("./config/db");
 //neww-----
 const resumeRoutes = require("./routes/resumeRoutes");
@@ -14,9 +14,10 @@ const analyticsRoutes = require(
 );
 const skillCatalogRoutes = require("./routes/skillCatalogRoutes");
 const roleRequirementRoutes = require("./routes/roleRequirementRoutes");
+// console.log("roleRequirementRoutes:", roleRequirementRoutes);
 const skillGapRoutes = require("./routes/skillGapRoutes");
-console.log("analyticsRoutes:", analyticsRoutes);
-console.log("skillCatalogRoutes:", skillCatalogRoutes);
+ console.log("analyticsRoutes:", analyticsRoutes);
+ console.log("skillCatalogRoutes:", skillCatalogRoutes);
 dotenv.config();
 
 connectDB();
@@ -56,7 +57,11 @@ app.use("/api/resume", resumeRoutes);
 app.use("/api/certifications", certificationRoutes);
 app.use("/api/analytics",analyticsRoutes);
 app.use("/api/skill-catalog",skillCatalogRoutes);
-app.use("/api/roles", roleRequirementRoutes);
+// app.use("/api/roles", roleRequirementRoutes);
+app.use("/api/roles", (req, res, next) => {
+  console.log("✅ /api/roles hit");
+  next();
+}, roleRequirementRoutes);
 app.use("/api/skill-gap", skillGapRoutes);
 const PORT =
   process.env.PORT || 5000;
