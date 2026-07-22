@@ -270,8 +270,12 @@ pip install pdfplumber
 pip install python-docx
 pip install spacy
 python -m spacy download en_core_web_sm
+npm install groq-sdk
 ```
-
+Install Groq api
+```bash
+npm install groq-sdk
+```
 ---
 
 # Environment Variables
@@ -286,6 +290,7 @@ PORT=5000
 MONGO_URI=your_mongodb_connection_string
 
 JWT_SECRET=your_secret_key
+GROQ_API_KEY= your_api_key
 ```
 
 ---
