@@ -578,6 +578,12 @@ POST /api/role-requirements
 GET /api/skill-gap/:employeeId/:roleId
 ```
 
+## Learning Recommendations
+
+```
+GET /api/recommendations/:employeeId/:roleId
+```
+
 ## Employee Ranking
 
 Search results are ranked using the following formula:
