@@ -1,8 +1,9 @@
-const User = require("../models/User");
 const Skill = require("../models/Skill");
 const EmployeeProfile = require("../models/EmployeeProfile");
+const User = require("../models/User");
 const Certification = require("../models/Certification");
 const calculateTrustScore = require("../utils/trustScore");
+
 const {
   PROFICIENCY_SCORES,
   escapeRegex,
@@ -43,29 +44,79 @@ const searchEmployees = async (req, res) => {
     const skills = await Skill.find(filter)
       .populate("userId", "name email role");
 
-    const results = skills.map((s) => {
+    // Group skills by userId
+    const userSkillsMap = {};
+    skills.forEach(skill => {
+      const userId = skill.userId._id.toString();
+      if (!userSkillsMap[userId]) {
+        userSkillsMap[userId] = {
+          user: skill.userId,
+          skills: [],
+          totalScore: 0
+        };
+      }
+      
       let score = 0;
-
-      score += levelScore[s.proficiencyLevel] || 0;
-      score += s.yearsOfExperience || 0;
-      score += s.endorsementCount || 0;
-
-      if (s.source === "resume") score += 2;
-      if (s.source === "endorsed") score += 3;
-
-      return {
-        employee: s.userId,
-        matchedSkill: {
-          skillName: s.skillName,
-          category: s.category,
-          proficiencyLevel: s.proficiencyLevel,
-          yearsOfExperience: s.yearsOfExperience,
-          source: s.source,
-          endorsementCount: s.endorsementCount,
-        },
-        matchScore: score,
-      };
+      score += levelScore[skill.proficiencyLevel] || 0;
+      score += skill.yearsOfExperience || 0;
+      score += skill.endorsementCount || 0;
+      if (skill.source === "resume") score += 2;
+      if (skill.source === "endorsed") score += 3;
+      
+      userSkillsMap[userId].skills.push({
+        skillName: skill.skillName,
+        category: skill.category,
+        proficiencyLevel: skill.proficiencyLevel,
+        yearsOfExperience: skill.yearsOfExperience,
+        source: skill.source,
+        endorsementCount: skill.endorsementCount,
+        _id: skill._id
+      });
+      userSkillsMap[userId].totalScore += score;
     });
+
+    // Get profiles for users
+    const userIds = Object.keys(userSkillsMap);
+    const profiles = await EmployeeProfile.find({
+      userId: { $in: userIds }
+    });
+
+    const profileMap = {};
+    profiles.forEach(profile => {
+      profileMap[profile.userId.toString()] = profile;
+    });
+
+    // Build results
+    const results = Object.values(userSkillsMap).map(item => ({
+    employee: item.user,
+    profile: profileMap[item.user._id.toString()] || null,
+    skills: item.skills,
+    matchScore: Math.round(item.totalScore / item.skills.length * 10) / 10
+}));
+
+    // const results = skills.map((s) => {
+    //   let score = 0;
+
+    //   score += levelScore[s.proficiencyLevel] || 0;
+    //   score += s.yearsOfExperience || 0;
+    //   score += s.endorsementCount || 0;
+
+    //   if (s.source === "resume") score += 2;
+    //   if (s.source === "endorsed") score += 3;
+
+    //   return {
+    //     employee: s.userId,
+    //     matchedSkill: {
+    //       skillName: s.skillName,
+    //       category: s.category,
+    //       proficiencyLevel: s.proficiencyLevel,
+    //       yearsOfExperience: s.yearsOfExperience,
+    //       source: s.source,
+    //       endorsementCount: s.endorsementCount,
+    //     },
+    //     matchScore: score,
+    //   };
+    // });
 
     results.sort((a, b) => b.matchScore - a.matchScore);
 
@@ -79,6 +130,8 @@ const searchEmployees = async (req, res) => {
     });
   }
 };
+
+
 const advancedEmployeeSearch = async (req, res) => {
   try {
     const {
@@ -533,6 +586,7 @@ const advancedEmployeeSearch = async (req, res) => {
           data.skillScore +
           coverageBonus +
           certificationBonus;
+
         const trustScore = calculateTrustScore({
            matchedSkills: data.matchedSkills,
             certifications,
@@ -544,8 +598,8 @@ const advancedEmployeeSearch = async (req, res) => {
             profileMap.get(userId) || null,
           matchedSkills: data.matchedSkills,
           certifications,
-          matchedSkillCount,
           trustScore,
+          matchedSkillCount,
           requestedSkillCount:
             requestedSkills.length,
           matchPercentage:
@@ -596,6 +650,7 @@ const advancedEmployeeSearch = async (req, res) => {
       limit: pageLimit,
       totalPages,
       matchMode: normalizedMatchMode,
+      
       appliedFilters: {
         skills: requestedSkills,
         department: department || null,
