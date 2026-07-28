@@ -8,6 +8,7 @@ import Skills from "./pages/Skills/Skills";
 import Search from "./pages/Search/Search";
 import Resume from "./pages/Resume/Resume";
 import ProtectedRoute from "/src/components/ProtectedRoute/ProtectedRoute/ProtectedRoute.jsx";
+import SkillGap from "./pages/SkillGap/SkillGap";
 
 
 
@@ -60,6 +61,15 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/skill-gap"
+  element={
+    <ProtectedRoute>
+      <SkillGap />
+    </ProtectedRoute>
+  }
+/>
+
 
       <Route path="*" element={<h2 style={{textAlign:"center", marginTop:"50px"}}>404 Page Not Found</h2>} />
     </Routes>

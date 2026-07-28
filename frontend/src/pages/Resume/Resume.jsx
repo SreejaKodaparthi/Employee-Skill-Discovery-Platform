@@ -190,32 +190,36 @@ const Resume = () => {
                 flexWrap: "wrap",
               }}
             >
-              <button
-                onClick={() =>
-                  alert(
-                    "Automatic skill import will be added in a future update."
-                  )
-                }
-                style={{
-                  background:
-                    "linear-gradient(135deg,#7c3aed,#a78bfa)",
-                  color: "#fff",
-                  border: "none",
-                  padding:
-                    "10px 28px",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                }}
-              >
-                ➕ Add Skills to
-                Profile
-              </button>
+             <button
+  onClick={() =>
+    navigate("/skills", {
+      state: {
+        parsedSkills: data.skills,
+      },
+    })
+  }
+  style={{
+    background:
+      "linear-gradient(135deg,#7c3aed,#a78bfa)",
+    color: "#fff",
+    border: "none",
+    padding: "10px 28px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "600",
+  }}
+>
+  ➕ Add Skills to Profile
+</button>
 
               <button
-                onClick={() =>
-                  navigate("/skills")
-                }
+                 onClick={() =>
+    navigate("/skills", {
+      state: {
+          parsedSkills: res.data.parsedData.skills
+      },
+    })
+  }
                 style={{
                   background:
                     "transparent",

@@ -1,0 +1,345 @@
+/* ===========================
+   Skill Gap Container
+=========================== */
+
+.skill-gap-container {
+  max-width: 1050px;
+  margin: 35px auto;
+  padding: 20px;
+}
+
+.skill-gap-container h2 {
+  text-align: center;
+  color: #4f46e5;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+/* ===========================
+   Selection Card
+=========================== */
+
+.skill-gap-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  gap: 18px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 25px rgba(79,70,229,.08);
+}
+
+.skill-gap-card label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.skill-gap-card select {
+  min-width: 280px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+  transition: .3s;
+}
+
+.skill-gap-card select:focus {
+  border-color: #4f46e5;
+}
+
+.skill-gap-card button {
+  padding: 11px 24px;
+  border: none;
+  border-radius: 10px;
+  background: #4f46e5;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.skill-gap-card button:hover {
+  background: #4338ca;
+  transform: translateY(-2px);
+}
+
+.skill-gap-card button:disabled {
+  background: #b5b5b5;
+  cursor: not-allowed;
+}
+
+/* ===========================
+   Match Card
+=========================== */
+
+.match-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 25px rgba(79,70,229,.08);
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.match-header h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.match-label {
+  color: #777;
+  font-size: 14px;
+}
+
+.match-right {
+  text-align: right;
+}
+
+.match-right h1 {
+  margin: 0;
+  color: #4f46e5;
+  font-size: 44px;
+  font-weight: 700;
+}
+
+/* ===========================
+   Status Badge
+=========================== */
+
+.status-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.excellent {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.good {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.average {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.poor {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ===========================
+   Progress Bar
+=========================== */
+
+.progress {
+  margin-top: 18px;
+  height: 10px;
+  background: #ececec;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg,#4f46e5,#7c3aed);
+  border-radius: 20px;
+}
+
+/* ===========================
+   Statistics
+=========================== */
+
+.stats {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 15px;
+}
+
+.stat-card {
+  background: #f8f9ff;
+  border: 1px solid #ececff;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-card span {
+  display: block;
+  color: #666;
+  font-size: 13px;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 24px;
+  color: #4f46e5;
+}
+
+/* ===========================
+   Grid
+=========================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* ===========================
+   Cards
+=========================== */
+
+.box {
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(79,70,229,.08);
+  transition: .25s;
+}
+
+.box:hover,
+.match-card:hover {
+  transform: translateY(-3px);
+}
+
+.box h3 {
+  color: #4f46e5;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+/* ===========================
+   Chips
+=========================== */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 15px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.red {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* ===========================
+   Text
+=========================== */
+
+.box p {
+  color: #555;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+.box ul {
+  padding-left: 20px;
+  margin-top: 12px;
+}
+
+.box li {
+  margin-bottom: 10px;
+  color: #444;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ===========================
+   Error
+=========================== */
+
+.error {
+  text-align: center;
+  color: red;
+  font-weight: 600;
+  margin: 15px 0;
+}
+
+/* ===========================
+   Mobile
+=========================== */
+
+@media(max-width:768px){
+
+.skill-gap-container{
+padding:15px;
+}
+
+.skill-gap-card{
+flex-direction:column;
+align-items:stretch;
+}
+
+.skill-gap-card select,
+.skill-gap-card button{
+width:100%;
+}
+
+.match-header{
+flex-direction:column;
+align-items:flex-start;
+gap:15px;
+}
+
+.match-right{
+text-align:left;
+}
+
+.stats{
+grid-template-columns:1fr;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.match-right h1{
+font-size:36px;
+}
+
+.box h3{
+font-size:20px;
+}
+
+}

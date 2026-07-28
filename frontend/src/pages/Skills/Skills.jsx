@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import API from "../../services/api";
 import "./Skills.css";
 
 function Skills() {
   const [skills, setSkills] = useState([]);
+  const location = useLocation();
+const parsedSkills = location.state?.parsedSkills || [];
+const [currentSkillIndex, setCurrentSkillIndex] = useState(0);
   const [formData, setFormData] = useState({
     skillName: "",
     category: "",
@@ -17,7 +21,19 @@ function Skills() {
   useEffect(() => {
     fetchSkills();
   }, []);
+useEffect(() => {
+  if (parsedSkills.length > 0) {
+    setCurrentSkillIndex(0);
 
+    setFormData({
+      skillName: parsedSkills[0],
+      category: "technical",
+      proficiencyLevel: "beginner",
+      yearsOfExperience: "",
+      source: "resume",
+    });
+  }
+}, [parsedSkills]);
   const fetchSkills = async () => {
     try {
       const res = await API.get("/skills");
@@ -42,34 +58,103 @@ function Skills() {
 };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
+ const exists = skills.some(
+  (skill) =>
+    skill.skillName.toLowerCase() ===
+    formData.skillName.toLowerCase()
+);
 
-    try {
-      if (editingId) {
-        await API.put(`/skills/${editingId}`, formData);
-        alert("✅ Skill Updated Successfully!");
-      } else {
-        await API.post("/skills", formData);
-        alert("✅ Skill Added Successfully!");
+if (exists) {
+
+  if (
+    parsedSkills.length > 0 &&
+    currentSkillIndex < parsedSkills.length - 1
+  ) {
+
+    const next = currentSkillIndex + 1;
+
+    setCurrentSkillIndex(next);
+
+    setFormData({
+      skillName: parsedSkills[next],
+      category: "technical",
+      proficiencyLevel: "beginner",
+      yearsOfExperience: "",
+      source: "resume",
+    });
+
+    setLoading(false);
+    return;
+  }
+
+  setCurrentSkillIndex(parsedSkills.length);
+
+  setFormData({
+    skillName: "",
+    category: "",
+    proficiencyLevel: "beginner",
+    yearsOfExperience: "",
+    source: "",
+  });
+
+  setLoading(false);
+  return;
+}
+
+  try {
+    if (editingId) {
+      await API.put(`/skills/${editingId}`, formData);
+       alert("✅ Skill Updated Successfully!");
+    } else {
+      await API.post("/skills", formData);
+      alert("✅ Skill Added Successfully!");
+
+      // Resume flow
+      if (
+        parsedSkills.length > 0 &&
+        currentSkillIndex < parsedSkills.length - 1
+      ) {
+        const next = currentSkillIndex + 1;
+
+        setCurrentSkillIndex(next);
+
+        setFormData({
+          skillName: parsedSkills[next],
+          category: "technical",
+          proficiencyLevel: "beginner",
+          yearsOfExperience: "",
+          source: "resume",
+        });
+
+        fetchSkills();
+        return;
       }
-
-      setFormData({
-        skillName: "",
-        category: "",
-        proficiencyLevel: "beginner",
-        yearsOfExperience: "",
-        source: "",
-        // endorsementCount: 0,
-      });
-      setEditingId(null);
-      fetchSkills();
-    } catch (err) {
-      alert(err.response?.data?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
     }
-  };
+
+    // Reset form after last skill or normal add
+    if (parsedSkills.length > 0) {
+  setCurrentSkillIndex(parsedSkills.length);
+}
+
+    setFormData({
+      skillName: "",
+      category: "",
+      proficiencyLevel: "beginner",
+      yearsOfExperience: "",
+      source: "",
+    });
+
+    setEditingId(null);
+    fetchSkills();
+
+  } catch (err) {
+    alert(err.response?.data?.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const editSkill = (skill) => {
     setEditingId(skill._id);
@@ -111,11 +196,31 @@ function Skills() {
     <div className="skills-page">
       <h2>⚡ My Skills</h2>
       <p className="subtitle">Showcase your expertise</p>
+      {parsedSkills.length > 0 &&
+ currentSkillIndex < parsedSkills.length && (
+
+<div className="resume-info">
+
+<h3>
+Resume Skill {currentSkillIndex + 1} of {parsedSkills.length}
+</h3>
+
+<p>
+This skill was extracted from your resume.
+Select the proficiency level and years of experience,
+then click Add.
+</p>
+
+</div>
+
+)}
+
 
       <form className="skill-form" onSubmit={handleSubmit}>
         <input
           type="text"
           name="skillName"
+          readOnly={parsedSkills.length > 0}
           placeholder="Skill Name *"
           value={formData.skillName}
           onChange={handleChange}
@@ -128,8 +233,8 @@ function Skills() {
           value={formData.category}
           onChange={handleChange}
         /> */}
-         <select name="category" value={formData.category} onChange={handleChange}>
-          <option value="techical">Technical Skill</option>
+         <select name="category" value={formData.category}  disabled={parsedSkills.length > 0} onChange={handleChange}>
+          <option value="technical">Technical Skill</option>
           <option value="soft"> SoftSkill</option>
           
         </select>
@@ -151,7 +256,7 @@ function Skills() {
         />
         <select
   name="source"
-  value={formData.source}
+  value={formData.source} disabled={parsedSkills.length > 0}
   onChange={handleChange}
 >
   <option value="">Select Source</option>
@@ -229,3 +334,4 @@ function Skills() {
 }
 
 export default Skills;
+

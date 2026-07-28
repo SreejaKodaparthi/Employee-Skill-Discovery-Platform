@@ -17,7 +17,9 @@ function Dashboard() {
   const getUser = async () => {
     try {
       const res = await API.get("/auth/me");
+      console.log("Logged in user:", res.data.user);
       setUser(res.data.user);
+      
     } catch (err) {
       console.error("Failed to fetch user:", err);
       logout();
@@ -83,6 +85,12 @@ function Dashboard() {
         <h3>Resume Parser</h3>
         <p>Upload and parse your resume</p>
       </div>
+      {/* Everyone */}
+<div className="card-box" onClick={() => navigate("/skill-gap")}>
+  <span className="icon">📊</span>
+  <h3>Skill Gap Analysis</h3>
+  <p>Analyze your skills against a target role</p>
+</div>
 
       {/* Only Manager, HR and L&D */}
       {["manager", "hr", "ld"].includes(user?.role) && (
