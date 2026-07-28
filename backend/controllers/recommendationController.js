@@ -8,6 +8,17 @@ const getRecommendation = async (req, res) => {
       roleId
     } = req.params;
 
+    // --- Restrict employees to their own data ---
+    if (
+      req.user.role === "employee" &&
+      req.user._id.toString() !== employeeId
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to view this recommendation.",
+      });
+    }
+    
     const recommendation =
       await Recommendation.findOne({
         employeeId,

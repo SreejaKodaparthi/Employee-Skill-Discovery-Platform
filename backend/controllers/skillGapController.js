@@ -23,6 +23,17 @@ const generateSkillGapReport = async (req, res) => {
   try {
     const { employeeId, roleId } = req.params;
 
+    // --- Restrict employees to their own data ---
+    if (
+      req.user.role === "employee" &&
+      req.user._id.toString() !== employeeId
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to view this report.",
+      });
+    }
+    
     // --- Validate employee ---
     const employee = await User.findById(employeeId);
     if (!employee) {
