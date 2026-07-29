@@ -233,10 +233,21 @@ then click Add.
           value={formData.category}
           onChange={handleChange}
         /> */}
-         <select name="category" value={formData.category}  disabled={parsedSkills.length > 0} onChange={handleChange}>
+
+         {/* <select name="category" value={formData.category}  disabled={parsedSkills.length > 0} onChange={handleChange}>
           <option value="technical">Technical Skill</option>
           <option value="soft"> SoftSkill</option>
           
+        </select> */}
+
+        <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+          >
+            <option value="">Select Category</option>
+            <option value="technical">Technical Skill</option>
+            <option value="soft">Soft Skill</option>
         </select>
 
         <select name="proficiencyLevel" value={formData.proficiencyLevel} onChange={handleChange}>
