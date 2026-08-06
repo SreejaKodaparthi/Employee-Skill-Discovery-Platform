@@ -226,17 +226,20 @@ then click Add.
           onChange={handleChange}
           required
         />
-        <select
+        
+<select
   name="category"
   value={formData.category}
-  disabled={parsedSkills.length > 0}
   onChange={handleChange}
+  disabled={parsedSkills.length > 0}
+  required
 >
-  <option value="">Select Category</option>
+  <option value="" disabled>
+    Select Category
+  </option>
   <option value="technical">Technical Skill</option>
   <option value="soft">Soft Skill</option>
 </select>
-       
         <select name="proficiencyLevel" value={formData.proficiencyLevel} onChange={handleChange}>
           <option value="beginner">Beginner</option>
           <option value="intermediate"> Intermediate</option>
