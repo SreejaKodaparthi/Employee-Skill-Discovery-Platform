@@ -291,6 +291,8 @@ MONGO_URI=your_mongodb_connection_string
 
 JWT_SECRET=your_secret_key
 GROQ_API_KEY= your_api_key
+CLIENT_URL=https://employee-skill.vercel.app
+NODE_ENV=production
 ```
 
 ---
