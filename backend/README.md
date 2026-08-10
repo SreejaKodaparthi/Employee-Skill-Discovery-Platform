@@ -272,6 +272,7 @@ pip install spacy
 python -m spacy download en_core_web_sm
 npm install groq-sdk
 npm install express-rate-limit
+npm install nodemailer
 ```
 Install Groq api
 ```bash
