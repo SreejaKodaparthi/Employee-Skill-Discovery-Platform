@@ -78,12 +78,12 @@ function Register() {
             required
             minLength="6"
           />
-          <select name="role" value={formData.role} onChange={handleChange}>
+          {/* <select name="role" value={formData.role} onChange={handleChange}>
             <option value="employee">👔 Employee</option>
             <option value="manager">📊 Manager</option>
             <option value="hr">🏢 HR</option>
             <option value="ld">📚 L&D</option>
-          </select>
+          </select> */}
           <button type="submit" className="btn-success" disabled={loading}>
             {loading ? "Creating Account..." : "Create Account"}
           </button>

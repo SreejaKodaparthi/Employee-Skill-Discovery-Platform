@@ -24,7 +24,7 @@ const skillCatalogRoutes = require("./routes/skillCatalogRoutes");
 const roleRequirementRoutes = require("./routes/roleRequirementRoutes");
 const skillGapRoutes = require("./routes/skillGapRoutes");
 const recommendationRoutes = require("./routes/recommendationRoutes");
-
+const userRoutes = require("./routes/userRoutes");
 // Connect Database
 connectDB();
 
@@ -93,7 +93,7 @@ app.use("/api/skill-catalog", skillCatalogRoutes);
 app.use("/api/roles", roleRequirementRoutes);
 app.use("/api/skill-gap", skillGapRoutes);
 app.use("/api/recommendations", recommendationRoutes);
-
+app.use("/api/users", userRoutes);
 /* ------------------------------------------------------------------
    Start Server
 ------------------------------------------------------------------ */

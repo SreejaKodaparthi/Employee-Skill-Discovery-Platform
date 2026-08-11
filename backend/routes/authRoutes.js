@@ -1,57 +1,3 @@
-// const express = require("express");
-
-// const {
-//   registerUser,
-//   loginUser,
-//   getMe,
-//   forgotPassword,
-//   resetPassword,
-// } = require("../controllers/authController");
-
-// const {
-//   protect,
-// } = require("../middleware/authMiddleware");
-
-// const router = express.Router();
-
-
-// // ======================================================
-// // AUTH ROUTES
-// // ======================================================
-
-// // Register
-// router.post("/register", registerUser);
-
-// // Login
-// router.post("/login", loginUser);
-
-// // Get logged-in user
-// router.get(
-//   "/me",
-//   protect,
-//   getMe
-// );
-
-
-// // ======================================================
-// // PASSWORD RESET ROUTES
-// // ======================================================
-
-// // Request password reset
-// router.post(
-//   "/forgot-password",
-//   forgotPassword
-// );
-
-// // Reset password using token
-// router.post(
-//   "/reset-password/:token",
-//   resetPassword
-// );
-
-
-// module.exports = router;
-
 const express = require("express");
 
 const {
@@ -60,10 +6,12 @@ const {
   getMe,
   forgotPassword,
   resetPassword,
+  updateUserRole,
 } = require("../controllers/authController");
 
 const {
   protect,
+  authorizeRoles,
 } = require("../middleware/authMiddleware");
 
 const router = express.Router();
@@ -104,5 +52,10 @@ router.post(
   resetPassword
 );
 
-
+router.patch(
+  "/users/:userId/role",
+  protect,
+  authorizeRoles("hr"),
+  updateUserRole
+);
 module.exports = router;

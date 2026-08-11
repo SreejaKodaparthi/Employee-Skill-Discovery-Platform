@@ -298,7 +298,6 @@ NODE_ENV=production
 ```
 
 ---
-
 # Running the Backend
 
 ```bash

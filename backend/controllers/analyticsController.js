@@ -2,7 +2,11 @@ const User = require("../models/User");
 const Skill = require("../models/Skill");
 const EmployeeProfile = require("../models/EmployeeProfile");
 const Certification = require("../models/Certification");
-
+const RoleRequirement = require("../models/RoleRequirement");
+// Normalize skill names for consistent comparison
+const normalize = (skill) => {
+  return skill.trim().toLowerCase();
+};
 /**
  * GET /api/analytics/summary
  *
@@ -768,6 +772,363 @@ const getCertificationAnalytics = async (req, res) => {
     });
   }
 };
+const getSkillGapAnalytics = async (req, res) => {
+  try {
+    const { roleId } = req.query;
+
+    // --------------------------------------------------
+    // 1. Fetch active roles
+    // --------------------------------------------------
+
+    let roles;
+
+    if (roleId) {
+      const role = await RoleRequirement.findOne({
+        _id: roleId,
+        isActive: true,
+      });
+
+      if (!role) {
+        return res.status(404).json({
+          success: false,
+          message: "Role requirement not found",
+        });
+      }
+
+      roles = [role];
+    } else {
+      roles = await RoleRequirement.find({
+        isActive: true,
+      }).sort({
+        roleName: 1,
+      });
+    }
+
+    // --------------------------------------------------
+    // 2. Fetch employees
+    // --------------------------------------------------
+
+    const employees = await User.find({
+      role: "employee",
+    }).select("_id name email");
+
+    // --------------------------------------------------
+    // 3. Fetch employee skills
+    // --------------------------------------------------
+
+    const employeeIds = employees.map(
+      (employee) => employee._id
+    );
+
+    const allSkills = await Skill.find({
+      userId: {
+        $in: employeeIds,
+      },
+    }).select("userId skillName");
+
+    // --------------------------------------------------
+    // 4. Create employee -> skills map
+    // --------------------------------------------------
+
+    const employeeSkillMap = new Map();
+
+    employees.forEach((employee) => {
+      employeeSkillMap.set(
+        employee._id.toString(),
+        []
+      );
+    });
+
+    allSkills.forEach((skill) => {
+      const employeeId = skill.userId.toString();
+
+      if (!employeeSkillMap.has(employeeId)) {
+        employeeSkillMap.set(employeeId, []);
+      }
+
+      employeeSkillMap
+        .get(employeeId)
+        .push(skill);
+    });
+
+    // --------------------------------------------------
+    // 5. Dashboard calculations
+    // --------------------------------------------------
+
+    const roleReports = [];
+
+    const missingSkillCounts = {};
+
+    let totalEmployeesAnalyzed = 0;
+    let totalEmployeesWithGaps = 0;
+    let totalEmployeesFullyMatched = 0;
+
+    let totalMatchedSkills = 0;
+    let totalMissingSkills = 0;
+
+    let totalMatchPercentage = 0;
+    let matchPercentageCount = 0;
+
+    // --------------------------------------------------
+    // 6. Process each role
+    // --------------------------------------------------
+
+    for (const role of roles) {
+      const requiredSkills =
+        role.requiredSkills || [];
+
+      const employeeReports = [];
+
+      for (const employee of employees) {
+        const employeeSkills =
+          employeeSkillMap.get(
+            employee._id.toString()
+          ) || [];
+
+        // ----------------------------------------------
+        // Normalize employee skills
+        // ----------------------------------------------
+
+        const employeeSkillNames =
+          employeeSkills.map((skill) =>
+            normalize(skill.skillName)
+          );
+
+        // ----------------------------------------------
+        // Normalize required role skills
+        // ----------------------------------------------
+
+        const requiredSkillNames =
+          requiredSkills.map((skill) =>
+            normalize(skill.skillName)
+          );
+
+        // ----------------------------------------------
+        // Matched + Missing
+        // ----------------------------------------------
+
+        const matchedSkills = [];
+        const missingSkills = [];
+
+        requiredSkillNames.forEach((skill) => {
+          if (
+            employeeSkillNames.includes(skill)
+          ) {
+            matchedSkills.push(skill);
+          } else {
+            missingSkills.push(skill);
+
+            // Track how many employees are missing
+            // this skill
+            const originalSkill =
+              requiredSkills.find(
+                (requiredSkill) =>
+                  normalize(
+                    requiredSkill.skillName
+                  ) === skill
+              );
+
+            const displayName =
+              originalSkill
+                ? originalSkill.skillName
+                : skill;
+
+            missingSkillCounts[displayName] =
+              (missingSkillCounts[displayName] ||
+                0) + 1;
+          }
+        });
+
+        // ----------------------------------------------
+        // Extra skills
+        // ----------------------------------------------
+
+        const extraSkills =
+          employeeSkillNames.filter(
+            (skill) =>
+              !requiredSkillNames.includes(skill)
+          );
+
+        // ----------------------------------------------
+        // Match percentage
+        // ----------------------------------------------
+
+        const matchPercentage =
+          requiredSkillNames.length === 0
+            ? 100
+            : Math.round(
+                (matchedSkills.length /
+                  requiredSkillNames.length) *
+                  100
+              );
+
+        // ----------------------------------------------
+        // Determine whether employee has a gap
+        // ----------------------------------------------
+
+        const hasGap =
+          missingSkills.length > 0;
+
+        if (hasGap) {
+          totalEmployeesWithGaps++;
+        } else {
+          totalEmployeesFullyMatched++;
+        }
+
+        totalEmployeesAnalyzed++;
+
+        totalMatchedSkills +=
+          matchedSkills.length;
+
+        totalMissingSkills +=
+          missingSkills.length;
+
+        totalMatchPercentage +=
+          matchPercentage;
+
+        matchPercentageCount++;
+
+        // ----------------------------------------------
+        // Employee report
+        // ----------------------------------------------
+
+        employeeReports.push({
+          employeeId: employee._id,
+          name: employee.name,
+          email: employee.email,
+
+          matchPercentage,
+
+          matchedSkills,
+
+          missingSkills,
+
+          extraSkills,
+
+          hasGap,
+        });
+      }
+
+      // ----------------------------------------------
+      // Lowest matching employees first
+      // ----------------------------------------------
+
+      employeeReports.sort(
+        (a, b) =>
+          a.matchPercentage -
+          b.matchPercentage
+      );
+
+      // ----------------------------------------------
+      // Role report
+      // ----------------------------------------------
+
+      roleReports.push({
+        roleId: role._id,
+        roleName: role.roleName,
+        department: role.department,
+
+        requiredSkills:
+          requiredSkills.length,
+
+        employeesAnalyzed:
+          employeeReports.length,
+
+        employeesWithGaps:
+          employeeReports.filter(
+            (employee) =>
+              employee.hasGap
+          ).length,
+
+        employeesFullyMatched:
+          employeeReports.filter(
+            (employee) =>
+              !employee.hasGap
+          ).length,
+
+        employees:
+          employeeReports,
+      });
+    }
+
+    // --------------------------------------------------
+    // 7. Most frequently missing skills
+    // --------------------------------------------------
+
+    const mostMissingSkills =
+      Object.entries(
+        missingSkillCounts
+      )
+        .map(
+          ([skillName, employeeCount]) => ({
+            skillName,
+            employeeCount,
+          })
+        )
+        .sort(
+          (a, b) =>
+            b.employeeCount -
+            a.employeeCount
+        );
+
+    // --------------------------------------------------
+    // 8. Overall average match percentage
+    // --------------------------------------------------
+
+    const averageMatchPercentage =
+      matchPercentageCount === 0
+        ? 0
+        : Math.round(
+            totalMatchPercentage /
+              matchPercentageCount
+          );
+
+    // --------------------------------------------------
+    // 9. Response
+    // --------------------------------------------------
+
+    return res.status(200).json({
+      success: true,
+
+      summary: {
+        totalEmployees:
+          employees.length,
+
+        totalRoles:
+          roles.length,
+
+        employeesAnalyzed:
+          totalEmployeesAnalyzed,
+
+        employeesWithGaps:
+          totalEmployeesWithGaps,
+
+        employeesFullyMatched:
+          totalEmployeesFullyMatched,
+
+        totalMatchedSkills,
+
+        totalMissingSkills,
+
+        averageMatchPercentage,
+      },
+
+      mostMissingSkills,
+
+      roles: roleReports,
+    });
+  } catch (error) {
+    console.error(
+      "Skill gap analytics error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 /**
  * GET /api/analytics/resume-stats
@@ -893,5 +1254,6 @@ module.exports = {
   getTopSkills,
   getDepartmentAnalytics,
   getCertificationAnalytics,
+  getSkillGapAnalytics,
   getResumeStats,
 };
