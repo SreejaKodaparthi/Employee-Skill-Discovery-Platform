@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 import { Link } from "react-router-dom";
 import "./ForgotPassword.css";
 
@@ -23,13 +23,16 @@ function ForgotPassword() {
     try {
       setLoading(true);
 
-      await axios.post(
-        "http://localhost:5000/api/auth/forgot-password",
-        {
-          email: email.trim(),
-        }
-      );
+      // await axios.post(
+      //   "http://localhost:5000/api/auth/forgot-password",
+      //   {
+      //     email: email.trim(),
+      //   }
+      // );
 
+      await API.post("/auth/forgot-password", {
+  email,
+});
       setMessage(
         "If an account exists with this email, a password reset link has been sent."
       );
