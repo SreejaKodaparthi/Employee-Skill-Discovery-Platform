@@ -398,7 +398,7 @@ function Search() {
                   </p>
 
                   <p>
-                    Coverage Bonus :{" "}
+                    Skill-Matched Coverage Bonus :{" "}
                     {
                       item.scoreBreakdown
                         .skillCoverageBonus
@@ -406,7 +406,7 @@ function Search() {
                   </p>
 
                   <p>
-                    Certification Bonus :{" "}
+                    Skill-Matched Certification Bonus :{" "}
                     {
                       item.scoreBreakdown
                         .certificationBonus

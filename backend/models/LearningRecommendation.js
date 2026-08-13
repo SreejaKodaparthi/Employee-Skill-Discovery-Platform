@@ -49,6 +49,10 @@ const learningRecommendationSchema = new mongoose.Schema(
   }
 );
 
+learningRecommendationSchema.index({
+    employeeId: 1,
+    roleId: 1,
+});
 // Export the model for use in other parts of the application
 module.exports = mongoose.model(
   "LearningRecommendation",

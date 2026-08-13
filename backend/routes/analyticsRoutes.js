@@ -5,6 +5,7 @@ const {
   getTopSkills,
   getDepartmentAnalytics,
   getCertificationAnalytics,
+  getSkillGapAnalytics,
   getResumeStats,
 } = require("../controllers/analyticsController");
 
@@ -45,6 +46,13 @@ router.get(
   "/certifications",
   authorizeRoles("manager", "hr", "ld"),
   getCertificationAnalytics
+);
+
+router.get(
+  "/skill-gaps",
+  protect,
+  authorizeRoles("hr","manager","ld"),
+  getSkillGapAnalytics
 );
 
 router.get(

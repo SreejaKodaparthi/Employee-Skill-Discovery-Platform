@@ -69,6 +69,13 @@ function Login() {
             onChange={handleChange}
             required
           />
+
+          <div className="forgot-password">
+            <Link to="/forgot-password">
+              Forgot Password?
+            </Link>
+          </div>
+
           <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? "Logging in..." : "Sign In"}
           </button>
@@ -82,6 +89,7 @@ function Login() {
           <strong>Demo Credentials:</strong><br />
           <code>employee@example.com</code> / <code>password123</code>
         </div>
+
       </div>
     </div>
   );

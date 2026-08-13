@@ -271,6 +271,8 @@ pip install python-docx
 pip install spacy
 python -m spacy download en_core_web_sm
 npm install groq-sdk
+npm install express-rate-limit
+npm install nodemailer
 ```
 Install Groq api
 ```bash
@@ -291,10 +293,17 @@ MONGO_URI=your_mongodb_connection_string
 
 JWT_SECRET=your_secret_key
 GROQ_API_KEY= your_api_key
+CLIENT_URL=https://employee-skill.vercel.app
+NODE_ENV=production
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-test-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+FRONTEND_URL=https://employee-skill.vercel.app
+
 ```
 
 ---
-
 # Running the Backend
 
 ```bash
@@ -374,6 +383,16 @@ POST /api/auth/login
 
 ```
 GET /api/auth/me
+```
+
+### User management
+
+```
+GET /api/users
+```
+
+```
+PUT /api/users/:id/role
 ```
 
 ---
@@ -502,6 +521,18 @@ GET /api/analytics/departments
 
 ```
 GET /api/analytics/certifications
+```
+
+### Skill-Gap
+
+```
+GET /api/analytics/skill-gaps
+```
+
+### Roles
+
+```
+GET /api/roles
 ```
 
 ### Resume

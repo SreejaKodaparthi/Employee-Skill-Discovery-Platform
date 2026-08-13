@@ -54,18 +54,6 @@ const skillSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
-
-    source: {
-      type: String,
-      enum: ["self", "resume", "endorsed"],
-      default: "self",
-    },
-
-    endorsementCount: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
   },
   {
     timestamps: true,
@@ -101,6 +89,13 @@ skillSchema.index({
 skillSchema.index({
   proficiencyLevel: 1,
   yearsOfExperience: -1,
+});
+
+//compound index
+skillSchema.index({
+  skillName:1,
+  proficiencyLevel:1,
+  yearsOfExperience:-1
 });
 
 /*
