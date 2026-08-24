@@ -262,10 +262,11 @@
 //  </div>;
 // }
 // >>>>>>> c6f86c44d5302f3574bf087aaff748500c9fdaca
-
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+
 
 export default function Login() {
   const { login } = useAuth();
