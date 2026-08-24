@@ -234,6 +234,14 @@ export default function Dashboard() {
       "/skill-gap",
     ],
   ];
+  if (user?.role === "hr") {
+  cards.push([
+    "👥",
+    "User Management",
+    "View users and assign their roles.",
+    "/user-management",
+  ]);
+}
 
   // Management-only features
   if (management) {

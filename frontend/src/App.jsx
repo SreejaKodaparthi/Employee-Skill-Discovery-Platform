@@ -190,6 +190,8 @@ import Certifications from "./pages/Certifications/Certifications";
 import Analytics from "./pages/Analytics/Analytics";
 import Roles from "./pages/Roles/Roles";
 
+import UserManagement from "./pages/UserManagement/UserManagement";
+
 import "./App.css";
 
 function App() {
@@ -247,6 +249,12 @@ function App() {
               path="/certifications"
               element={<Certifications />}
             />
+            <Route element={<ProtectedRoute roles={["hr"]} />}>
+  <Route
+    path="/user-management"
+    element={<UserManagement />}
+  />
+</Route>
 
 
             {/* ================= MANAGEMENT ROUTES ================= */}
