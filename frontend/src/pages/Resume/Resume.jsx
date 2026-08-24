@@ -564,7 +564,7 @@ export default function Resume() {
             </div>
 
             {/* Education */}
-            <div className="field full">
+            {/* <div className="field full">
               <label>Education</label>
 
               <div className="chips">
@@ -584,7 +584,7 @@ export default function Resume() {
             </div>
 
             {/* Certifications */}
-            <div className="field full">
+            {/* <div className="field full">
               <label>Certifications</label>
 
               <div className="chips">
@@ -601,10 +601,10 @@ export default function Resume() {
                   )
                 )}
               </div>
-            </div>
+            </div> */} */}
 
             {/* Experience details */}
-            <div className="field full">
+            {/* <div className="field full">
               <label>
                 Experience Details
               </label>
@@ -626,7 +626,7 @@ export default function Resume() {
               </div>
             </div>
 
-          </div>
+          </div> */}
 
           {/* Actions */}
           <div className="actions">
