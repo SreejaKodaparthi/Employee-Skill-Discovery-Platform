@@ -1,124 +1,40 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import "./Home.css";
 
-function Home() {
+export default function Home() {
   const { isAuthenticated } = useAuth();
-
-  return (
-    <div className="home-container">
-      {/* Hero Section */}
-      <div className="hero-section">
-        <span className="logo-big">🚀</span>
-        <h1>Employee Skill Discovery Platform</h1>
-        <p className="tagline">
-          Unlock your team's potential. Discover skills, find talent, and grow together.
-        </p>
-        <div className="hero-buttons">
-          {isAuthenticated ? (
-            <Link to="/dashboard" className="btn-hero-primary">
-              Go to Dashboard →
-            </Link>
-          ) : (
-            <>
-              <Link to="/login" className="btn-hero-primary">
-                Get Started →
-              </Link>
-              <Link to="/register" className="btn-hero-secondary">
-                Create Account
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="features-section">
-        <h2>✨ Key Features</h2>
-        <div className="features-grid">
-          <div className="feature-card">
-            <span className="feature-icon">👤</span>
-            <h4>Profile Management</h4>
-            <p>Create and update your professional profile with department, designation, location, and education.</p>
-          </div>
-          <div className="feature-card">
-            <span className="feature-icon">⚡</span>
-            <h4>Skill Management</h4>
-            <p>Add, update, or remove skills with proficiency levels, years of experience, and endorsements.</p>
-          </div>
-          <div className="feature-card">
-            <span className="feature-icon">🔍</span>
-            <h4>Talent Discovery</h4>
-            <p>Search for employees by skills, experience, and proficiency level to find the right talent.</p>
-          </div>
-          <div className="feature-card">
-            <span className="feature-icon">🏆</span>
-            <h4>Smart Matching</h4>
-            <p>Get match scores based on proficiency, experience, endorsements, and skill source.</p>
+  return <>
+    <section className="hero">
+      <div className="hero-inner">
+        <div>
+          <span className="badge">AI-powered talent discovery</span>
+          <h1>Discover the right <span>skills</span> for every opportunity.</h1>
+          <p>Manage employee skills, parse resumes, search talent, compare people with role requirements, and surface learning recommendations from one platform.</p>
+          <div className="actions">
+            <Link className="btn btn-primary" to={isAuthenticated ? "/dashboard" : "/register"}>{isAuthenticated ? "Open Dashboard" : "Get Started"}</Link>
+            {!isAuthenticated && <Link className="btn btn-secondary" to="/login">Sign In</Link>}
           </div>
         </div>
-      </div>
-
-      {/* How to Use Section */}
-      <div className="how-to-section">
-        <h2>📖 How to Use</h2>
-        <div className="how-to-steps">
-          <div className="step">
-            <div className="step-number">1</div>
-            <h5>Create Account</h5>
-            <p>Register with your name, email, password, and role (Employee, Manager, HR, or L&D).</p>
-          </div>
-          <div className="step">
-            <div className="step-number">2</div>
-            <h5>Set Up Profile</h5>
-            <p>Fill in your professional details like department, designation, location, and education.</p>
-          </div>
-          <div className="step">
-            <div className="step-number">3</div>
-            <h5>Add Skills</h5>
-            <p>List your skills with proficiency levels and years of experience to showcase your expertise.</p>
-          </div>
-          <div className="step">
-            <div className="step-number">4</div>
-            <h5>Discover Talent</h5>
-            <p>Use the search feature to find employees based on skills, experience, and proficiency.</p>
-          </div>
+        <div className="hero-art">
+          <div className="hero-stat"><span>Skill inventory</span><strong>Live</strong></div>
+          <div className="hero-stat"><span>Resume extraction</span><strong>PDF / DOCX</strong></div>
+          <div className="hero-stat"><span>Talent matching</span><strong>Ranked</strong></div>
+          <div className="hero-stat"><span>Skill-gap analysis</span><strong>AI assisted</strong></div>
         </div>
       </div>
-
-      {/* Roles Section */}
-      <div className="roles-section">
-        <h2>👥 User Roles</h2>
-        <div className="roles-grid">
-          <div className="role-card">
-            <span className="role-emoji">👔</span>
-            <h5>Employee</h5>
-            <p>Manage own profile and skills</p>
-          </div>
-          <div className="role-card">
-            <span className="role-emoji">📊</span>
-            <h5>Manager</h5>
-            <p>Search and discover employees</p>
-          </div>
-          <div className="role-card">
-            <span className="role-emoji">🏢</span>
-            <h5>HR</h5>
-            <p>Search and discover employees</p>
-          </div>
-          <div className="role-card">
-            <span className="role-emoji">📚</span>
-            <h5>L&D</h5>
-            <p>Search and discover employees</p>
-          </div>
-        </div>
+    </section>
+    <section className="section">
+      <h2>Everything connected to your backend</h2>
+      <div className="grid grid-3">
+        {[
+          ["⚡","Skills","Create, update and delete skills using the Skill Catalog."],
+          ["📄","Resume","Upload PDF/DOCX, parse it, then save extracted data."],
+          ["🔎","Talent Search","Advanced filters, match percentage and trust score."],
+          ["🏅","Certifications","Track credentials, expiry and verification status."],
+          ["📊","Analytics","Organisation-level skill, department and resume metrics."],
+          ["🎯","Skill Gap","Compare an employee against a role and retrieve AI recommendations."]
+        ].map(([icon,title,text]) => <div className="card feature" key={title}><div className="icon">{icon}</div><h3>{title}</h3><p>{text}</p></div>)}
       </div>
-
-      {/* Footer */}
-      <div className="footer-section">
-        <p>© 2026 Employee Skill Discovery Platform. Built with ❤️ for better talent management.</p>
-      </div>
-    </div>
-  );
+    </section>
+  </>;
 }
-
-export default Home;

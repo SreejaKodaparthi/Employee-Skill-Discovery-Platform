@@ -1,59 +1,26 @@
-// import axios from "axios";
-
-// const API = axios.create({
-//   baseURL: "http://localhost:5000/api",
-// });
-
-// // Automatically attach JWT token
-// API.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem("token");
-
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
-
-// export default API;
-
-
-
-// import axios from "axios";
-
-// const API = axios.create({
-//   baseURL: "http://localhost:5000/api",
-// });
-
-// API.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("token");
-
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-
-//   return config;
-// });
-
-// export default API;
-
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  timeout: 30000,
 });
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      if (window.location.pathname !== "/login") window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default API;
