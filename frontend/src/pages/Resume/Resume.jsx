@@ -263,404 +263,151 @@
 // }
 // >>>>>>> c6f86c44d5302f3574bf087aaff748500c9fdaca
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import API from "../../services/api";
-import { useAuth } from "../../context/AuthContext";
+{/* Extracted data */}
+{data && (
+  <div
+    className="card"
+    style={{ marginTop: 18 }}
+  >
+    <h2>Extracted Data</h2>
 
-export default function Resume() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+    <div className="grid grid-2">
 
-  const [file, setFile] = useState(null);
-  const [data, setData] = useState(null);
-  const [fileName, setFileName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
-  const [error, setError] = useState("");
-
-  const parse = async (e) => {
-    e.preventDefault();
-
-    if (!file) {
-      setError("Choose a PDF or DOCX file.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Maximum file size is 5 MB.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    setMsg("");
-    setData(null);
-
-    const formData = new FormData();
-    formData.append("resume", file);
-
-    try {
-      const res = await API.post(
-        "/resume/parse-resume",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      setData(res.data.parsedData);
-      setFileName(
-        res.data.fileName || file.name
-      );
-
-      setMsg(
-        "Resume parsed successfully. Review the extracted data before saving."
-      );
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        err.response?.data?.message ||
-          "Resume parsing failed."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const save = async () => {
-    if (!data) return;
-
-    setSaving(true);
-    setError("");
-    setMsg("");
-
-    try {
-      const res = await API.post(
-        "/resume/save-parsed-resume",
-        {
-          userId: user?._id || user?.id,
-          parsedData: data,
-          resumeFileName: fileName,
-        }
-      );
-
-      setMsg(
-        `${res.data.message} Added ${
-          res.data.addedSkillsCount || 0
-        } new resume skills.`
-      );
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        err.response?.data?.message ||
-          "Could not save parsed resume."
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const openSkills = () => {
-    if (!data?.skills?.length) {
-      return;
-    }
-
-    const parsedSkills = data.skills.map(
-      (skill) =>
-        typeof skill === "string"
-          ? skill
-          : skill.name
-    );
-
-    navigate("/skills", {
-      state: {
-        parsedSkills,
-      },
-    });
-  };
-
-  return (
-    <div
-      className="container-page"
-      style={{ maxWidth: 900 }}
-    >
-      <div className="page-head">
-        <h1>Resume Parser</h1>
+      {/* Name */}
+      <div>
+        <small style={{ color: "var(--muted)" }}>
+          Name
+        </small>
 
         <p>
-          Upload your resume to automatically extract
-          your skills and profile information.
+          <strong>
+            {data.name || "Not found"}
+          </strong>
         </p>
       </div>
 
-      {/* Upload */}
-      <div className="card">
-        <form onSubmit={parse}>
-          <div className="field">
-            <label>Resume file</label>
+      {/* Email */}
+      <div>
+        <small style={{ color: "var(--muted)" }}>
+          Email
+        </small>
 
-            <input
-              type="file"
-              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              onChange={(e) => {
-                setFile(
-                  e.target.files?.[0] || null
-                );
-                setData(null);
-                setError("");
-                setMsg("");
-              }}
-            />
-          </div>
-
-          <div className="actions">
-            <button
-              className="btn btn-primary"
-              disabled={loading}
-              type="submit"
-            >
-              {loading
-                ? "Parsing..."
-                : "Parse Resume"}
-            </button>
-
-            {file && (
-              <span
-                style={{
-                  alignSelf: "center",
-                  fontSize: 13,
-                  color: "var(--muted)",
-                }}
-              >
-                📎 {file.name}
-              </span>
-            )}
-          </div>
-        </form>
+        <p>
+          <strong>
+            {data.email || "Not found"}
+          </strong>
+        </p>
       </div>
 
-      {/* Messages */}
-      {error && (
-        <div className="alert alert-danger">
-          {error}
+      {/* Phone */}
+      <div>
+        <small style={{ color: "var(--muted)" }}>
+          Phone
+        </small>
+
+        <p>
+          <strong>
+            {data.phone || "Not found"}
+          </strong>
+        </p>
+      </div>
+
+      {/* Experience */}
+      <div>
+        <small style={{ color: "var(--muted)" }}>
+          Experience
+        </small>
+
+        <p>
+          <strong>
+            {Array.isArray(data.experience)
+              ? data.experience.length
+                ? "Available"
+                : "Not found"
+              : data.experience || "Not found"}
+          </strong>
+        </p>
+      </div>
+
+      {/* Skills */}
+      <div className="field full">
+        <label>
+          Skills ({data.skills?.length || 0})
+        </label>
+
+        <div className="chips">
+          {(data.skills || []).map(
+            (skill, index) => (
+              <span
+                className="chip"
+                key={
+                  typeof skill === "string"
+                    ? skill
+                    : skill.name || index
+                }
+              >
+                {typeof skill === "string"
+                  ? skill
+                  : skill.name}
+              </span>
+            )
+          )}
         </div>
-      )}
+      </div>
 
-      {msg && (
-        <div className="alert alert-success">
-          {msg}
-        </div>
-      )}
+      {/* Experience Details */}
+      <div className="field full">
+        <label>Experience Details</label>
 
-      {/* Extracted data */}
-      {data && (
-        <div
-          className="card"
-          style={{ marginTop: 18 }}
-        >
-          <h2>Extracted Data</h2>
-
-          <div className="grid grid-2">
-
-            <div>
-              <small
-                style={{
-                  color: "var(--muted)",
-                }}
-              >
-                Name
-              </small>
-
-              <p>
-                <strong>
-                  {data.name || "Not found"}
-                </strong>
-              </p>
-            </div>
-
-            <div>
-              <small
-                style={{
-                  color: "var(--muted)",
-                }}
-              >
-                Email
-              </small>
-
-              <p>
-                <strong>
-                  {data.email || "Not found"}
-                </strong>
-              </p>
-            </div>
-
-            <div>
-              <small
-                style={{
-                  color: "var(--muted)",
-                }}
-              >
-                Phone
-              </small>
-
-              <p>
-                <strong>
-                  {data.phone || "Not found"}
-                </strong>
-              </p>
-            </div>
-
-            <div>
-              <small
-                style={{
-                  color: "var(--muted)",
-                }}
-              >
-                Experience
-              </small>
-
-              <p>
-                <strong>
-                  {Array.isArray(data.experience)
-                    ? data.experience.length
-                      ? "Available"
-                      : "Not found"
-                    : data.experience ||
-                      "Not found"}
-                </strong>
-              </p>
-            </div>
-
-            {/* Skills */}
-            <div className="field full">
-              <label>
-                Skills ({data.skills?.length || 0})
-              </label>
-
-              <div className="chips">
-                {(data.skills || []).map(
-                  (skill, index) => (
-                    <span
-                      className="chip"
-                      key={
-                        typeof skill === "string"
-                          ? skill
-                          : skill.name || index
-                      }
-                    >
-                      {typeof skill === "string"
-                        ? skill
-                        : skill.name}
-                    </span>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* Education */}
-            {/* <div className="field full">
-              <label>Education</label>
-
-              <div className="chips">
-                {(data.education || []).map(
-                  (item, index) => (
-                    <span
-                      className="chip"
-                      key={index}
-                    >
-                      {typeof item === "string"
-                        ? item
-                        : JSON.stringify(item)}
-                    </span>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* Certifications */}
-            {/* <div className="field full">
-              <label>Certifications</label>
-
-              <div className="chips">
-                {(data.certifications || []).map(
-                  (item, index) => (
-                    <span
-                      className="chip"
-                      key={index}
-                    >
-                      {typeof item === "string"
-                        ? item
-                        : JSON.stringify(item)}
-                    </span>
-                  )
-                )}
-              </div>
-            </div> */} */}
-
-            {/* Experience details */}
-            {/* <div className="field full">
-              <label>
-                Experience Details
-              </label>
-
-              <div className="chips">
-                {(Array.isArray(data.experience)
-                  ? data.experience
-                  : []
-                ).map((item, index) => (
-                  <span
-                    className="chip"
-                    key={index}
-                  >
-                    {typeof item === "string"
-                      ? item
-                      : JSON.stringify(item)}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-          </div> */}
-
-          {/* Actions */}
-          <div className="actions">
-
-            <button
-              className="btn btn-primary"
-              disabled={saving}
-              onClick={save}
+        <div className="chips">
+          {(Array.isArray(data.experience)
+            ? data.experience
+            : []
+          ).map((item, index) => (
+            <span
+              className="chip"
+              key={index}
             >
-              {saving
-                ? "Saving..."
-                : "Save Parsed Resume"}
-            </button>
-
-            {data.skills?.length > 0 && (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={openSkills}
-              >
-                Add Skills to Profile
-              </button>
-            )}
-
-            <Link
-              className="btn btn-secondary"
-              to="/skills"
-            >
-              Open Skills
-            </Link>
-
-          </div>
+              {typeof item === "string"
+                ? item
+                : JSON.stringify(item)}
+            </span>
+          ))}
         </div>
-      )}
+      </div>
+
     </div>
-  );
-}
+
+    {/* Actions */}
+    <div className="actions">
+
+      <button
+        className="btn btn-primary"
+        disabled={saving}
+        onClick={save}
+      >
+        {saving
+          ? "Saving..."
+          : "Save Parsed Resume"}
+      </button>
+
+      {data.skills?.length > 0 && (
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={openSkills}
+        >
+          Add Skills to Profile
+        </button>
+      )}
+
+      <Link
+        className="btn btn-secondary"
+        to="/skills"
+      >
+        Open Skills
+      </Link>
+
+    </div>
+  </div>
+)}
