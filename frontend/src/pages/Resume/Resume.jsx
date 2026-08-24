@@ -263,151 +263,137 @@
 // }
 // >>>>>>> c6f86c44d5302f3574bf087aaff748500c9fdaca
 
-{/* Extracted data */}
-{data && (
-  <div
-    className="card"
-    style={{ marginTop: 18 }}
-  >
-    <h2>Extracted Data</h2>
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-    <div className="grid grid-2">
+export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-      {/* Name */}
-      <div>
-        <small style={{ color: "var(--muted)" }}>
-          Name
-        </small>
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
 
-        <p>
-          <strong>
-            {data.name || "Not found"}
-          </strong>
-        </p>
-      </div>
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-      {/* Email */}
-      <div>
-        <small style={{ color: "var(--muted)" }}>
-          Email
-        </small>
+  const submit = async (e) => {
+    e.preventDefault();
 
-        <p>
-          <strong>
-            {data.email || "Not found"}
-          </strong>
-        </p>
-      </div>
+    setLoading(true);
+    setError("");
 
-      {/* Phone */}
-      <div>
-        <small style={{ color: "var(--muted)" }}>
-          Phone
-        </small>
+    try {
+      await login(
+        form.email.trim(),
+        form.password
+      );
 
-        <p>
-          <strong>
-            {data.phone || "Not found"}
-          </strong>
-        </p>
-      </div>
+      navigate(
+        location.state?.from || "/dashboard",
+        { replace: true }
+      );
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Login failed."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      {/* Experience */}
-      <div>
-        <small style={{ color: "var(--muted)" }}>
-          Experience
-        </small>
+  return (
+    <div
+      className="container-page"
+      style={{ maxWidth: 520 }}
+    >
+      <div className="card">
 
-        <p>
-          <strong>
-            {Array.isArray(data.experience)
-              ? data.experience.length
-                ? "Available"
-                : "Not found"
-              : data.experience || "Not found"}
-          </strong>
-        </p>
-      </div>
-
-      {/* Skills */}
-      <div className="field full">
-        <label>
-          Skills ({data.skills?.length || 0})
-        </label>
-
-        <div className="chips">
-          {(data.skills || []).map(
-            (skill, index) => (
-              <span
-                className="chip"
-                key={
-                  typeof skill === "string"
-                    ? skill
-                    : skill.name || index
-                }
-              >
-                {typeof skill === "string"
-                  ? skill
-                  : skill.name}
-              </span>
-            )
-          )}
+        <div className="page-head">
+          <h1>Welcome back</h1>
+          <p>
+            Sign in to your SkillDiscovery account.
+          </p>
         </div>
-      </div>
 
-      {/* Experience Details */}
-      <div className="field full">
-        <label>Experience Details</label>
+        {error && (
+          <div className="alert alert-danger">
+            {error}
+          </div>
+        )}
 
-        <div className="chips">
-          {(Array.isArray(data.experience)
-            ? data.experience
-            : []
-          ).map((item, index) => (
-            <span
-              className="chip"
-              key={index}
-            >
-              {typeof item === "string"
-                ? item
-                : JSON.stringify(item)}
-            </span>
-          ))}
-        </div>
-      </div>
+        <form onSubmit={submit} className="grid">
 
-    </div>
+          <div className="field">
+            <label>Email</label>
 
-    {/* Actions */}
-    <div className="actions">
+            <input
+              type="email"
+              required
+              value={form.email}
+              placeholder="Enter your email"
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  email: e.target.value,
+                })
+              }
+            />
+          </div>
 
-      <button
-        className="btn btn-primary"
-        disabled={saving}
-        onClick={save}
-      >
-        {saving
-          ? "Saving..."
-          : "Save Parsed Resume"}
-      </button>
+          <div className="field">
+            <label>Password</label>
 
-      {data.skills?.length > 0 && (
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={openSkills}
+            <input
+              type="password"
+              required
+              value={form.password}
+              placeholder="Enter your password"
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  password: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          {/* Old functionality - Forgot Password */}
+          <div>
+            <Link to="/forgot-password">
+              Forgot Password?
+            </Link>
+          </div>
+
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={loading}
+          >
+            {loading
+              ? "Signing in..."
+              : "Sign In"}
+          </button>
+
+        </form>
+
+        <p
+          style={{
+            color: "var(--muted)",
+            fontSize: 14,
+          }}
         >
-          Add Skills to Profile
-        </button>
-      )}
+          New here?{" "}
+          <Link to="/register">
+            Create an account
+          </Link>
+        </p>
 
-      <Link
-        className="btn btn-secondary"
-        to="/skills"
-      >
-        Open Skills
-      </Link>
-
+      </div>
     </div>
-  </div>
-)}
+  );
+}
