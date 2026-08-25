@@ -267,134 +267,818 @@ import { Link, useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
-
-export default function Login() {
-  const { login } = useAuth();
+export default function Resume() {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [file, setFile] = useState(null);
+  const [data, setData] = useState(null);
+  const [fileName, setFileName] = useState("");
 
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const submit = async (e) => {
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+
+  // -----------------------------
+  // Parse Resume
+  // -----------------------------
+  const parse = async (e) => {
     e.preventDefault();
+
+    if (!file) {
+      setError("Please choose a PDF or DOCX file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Maximum file size is 5 MB.");
+      return;
+    }
 
     setLoading(true);
     setError("");
+    setMsg("");
+    setData(null);
+
+    const formData = new FormData();
+    formData.append("resume", file);
 
     try {
-      await login(
-        form.email.trim(),
-        form.password
+      const res = await API.post(
+        "/resume/parse-resume",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
-      navigate(
-        location.state?.from || "/dashboard",
-        { replace: true }
+      setData(res.data.parsedData);
+
+      setFileName(
+        res.data.fileName || file.name
+      );
+
+      setMsg(
+        "Resume parsed successfully. Review the extracted information before saving."
       );
     } catch (err) {
+      console.error(err);
+
       setError(
         err.response?.data?.message ||
-          "Login failed."
+          "Resume parsing failed."
       );
     } finally {
       setLoading(false);
     }
   };
 
+  // -----------------------------
+  // Save Parsed Resume
+  // -----------------------------
+  const save = async () => {
+    if (!data) return;
+
+    setSaving(true);
+    setError("");
+    setMsg("");
+
+    try {
+      const res = await API.post(
+        "/resume/save-parsed-resume",
+        {
+          userId: user?._id || user?.id,
+          parsedData: data,
+          resumeFileName: fileName,
+        }
+      );
+
+      setMsg(
+        `${res.data.message || "Resume saved successfully."} ${
+          res.data.addedSkillsCount || 0
+        } new resume skills added.`
+      );
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.response?.data?.message ||
+          "Could not save parsed resume."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // -----------------------------
+  // Open Skills
+  // -----------------------------
+  const openSkills = () => {
+    if (!data?.skills?.length) return;
+
+    const parsedSkills = data.skills.map(
+      (skill) =>
+        typeof skill === "string"
+          ? skill
+          : skill.name
+    );
+
+    navigate("/skills", {
+      state: {
+        parsedSkills,
+      },
+    });
+  };
+
+  // -----------------------------
+  // File Selection
+  // -----------------------------
+  const handleFileChange = (e) => {
+    const selectedFile =
+      e.target.files?.[0] || null;
+
+    setFile(selectedFile);
+    setData(null);
+    setError("");
+    setMsg("");
+
+    if (selectedFile) {
+      setFileName(selectedFile.name);
+    } else {
+      setFileName("");
+    }
+  };
+
   return (
     <div
-      className="container-page"
-      style={{ maxWidth: 520 }}
+      className="container-page resume-page"
+      style={{ maxWidth: 1000 }}
     >
-      <div className="card">
 
-        <div className="page-head">
-          <h1>Welcome back</h1>
+      {/* ================= HEADER ================= */}
+      <div className="page-head resume-header">
+        <div>
+          <span className="resume-label">
+            AI POWERED
+          </span>
+
+          <h1>Resume Parser</h1>
+
           <p>
-            Sign in to your SkillDiscovery account.
+            Upload your resume and automatically
+            extract your profile information and
+            skills.
           </p>
         </div>
+      </div>
 
-        {error && (
-          <div className="alert alert-danger">
-            {error}
-          </div>
-        )}
+      {/* ================= UPLOAD CARD ================= */}
+      <div className="card upload-card">
 
-        <form onSubmit={submit} className="grid">
+        <div className="upload-icon">
+          📄
+        </div>
 
-          <div className="field">
-            <label>Email</label>
+        <div className="upload-content">
+          <h2>Upload your resume</h2>
 
-            <input
-              type="email"
-              required
-              value={form.email}
-              placeholder="Enter your email"
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  email: e.target.value,
-                })
-              }
-            />
-          </div>
+          <p>
+            Supported formats: PDF and DOCX
+            <br />
+            Maximum file size: 5 MB
+          </p>
 
-          <div className="field">
-            <label>Password</label>
+          <form onSubmit={parse}>
 
-            <input
-              type="password"
-              required
-              value={form.password}
-              placeholder="Enter your password"
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  password: e.target.value,
-                })
-              }
-            />
-          </div>
+            <div className="resume-file-input">
+              <input
+                type="file"
+                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={handleFileChange}
+              />
+            </div>
 
-          {/* Old functionality - Forgot Password */}
-          <div>
-            <Link to="/forgot-password">
-              Forgot Password?
-            </Link>
-          </div>
+            {file && (
+              <div className="selected-file">
+                <span>📎</span>
 
-          <button
-            className="btn btn-primary"
-            type="submit"
-            disabled={loading}
-          >
-            {loading
-              ? "Signing in..."
-              : "Sign In"}
-          </button>
+                <div>
+                  <strong>{file.name}</strong>
 
-        </form>
+                  <small>
+                    {(file.size / 1024 / 1024).toFixed(
+                      2
+                    )}{" "}
+                    MB
+                  </small>
+                </div>
+              </div>
+            )}
 
-        <p
-          style={{
-            color: "var(--muted)",
-            fontSize: 14,
-          }}
-        >
-          New here?{" "}
-          <Link to="/register">
-            Create an account
-          </Link>
-        </p>
+            <button
+              type="submit"
+              className="btn btn-primary parse-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="button-spinner"></span>
+                  Parsing Resume...
+                </>
+              ) : (
+                <>
+                  🔍 Parse Resume
+                </>
+              )}
+            </button>
+
+          </form>
+        </div>
 
       </div>
+
+      {/* ================= ERROR ================= */}
+      {error && (
+        <div className="alert alert-danger resume-alert">
+          <span>⚠️</span>
+          {error}
+        </div>
+      )}
+
+      {/* ================= SUCCESS ================= */}
+      {msg && (
+        <div className="alert alert-success resume-alert">
+          <span>✓</span>
+          {msg}
+        </div>
+      )}
+
+      {/* ================= EXTRACTED DATA ================= */}
+      {data && (
+        <div className="card extracted-card">
+
+          <div className="extracted-header">
+            <div>
+              <span className="resume-label">
+                PARSED RESULT
+              </span>
+
+              <h2>Extracted Information</h2>
+
+              <p>
+                Review the information extracted
+                from your resume.
+              </p>
+            </div>
+          </div>
+
+          {/* Basic Information */}
+          <div className="section-title">
+            <span>👤</span>
+            Personal Information
+          </div>
+
+          <div className="info-grid">
+
+            <div className="info-box">
+              <span className="info-label">
+                FULL NAME
+              </span>
+
+              <strong>
+                {data.name || "Not found"}
+              </strong>
+            </div>
+
+            <div className="info-box">
+              <span className="info-label">
+                EMAIL
+              </span>
+
+              <strong>
+                {data.email || "Not found"}
+              </strong>
+            </div>
+
+            <div className="info-box">
+              <span className="info-label">
+                PHONE
+              </span>
+
+              <strong>
+                {data.phone || "Not found"}
+              </strong>
+            </div>
+
+            <div className="info-box">
+              <span className="info-label">
+                EXPERIENCE
+              </span>
+
+              <strong>
+                {Array.isArray(data.experience)
+                  ? data.experience.length
+                    ? `${data.experience.length} entries`
+                    : "Not found"
+                  : data.experience ||
+                    "Not found"}
+              </strong>
+            </div>
+
+          </div>
+
+          {/* Skills */}
+          <div className="section-title">
+            <span>⚡</span>
+            Skills
+            <span className="count-badge">
+              {data.skills?.length || 0}
+            </span>
+          </div>
+
+          <div className="skills-container">
+
+            {data.skills?.length ? (
+              data.skills.map(
+                (skill, index) => (
+                  <span
+                    className="skill-chip"
+                    key={
+                      typeof skill === "string"
+                        ? skill
+                        : skill.name || index
+                    }
+                  >
+                    {typeof skill === "string"
+                      ? skill
+                      : skill.name}
+                  </span>
+                )
+              )
+            ) : (
+              <span className="empty-text">
+                No skills found
+              </span>
+            )}
+
+          </div>
+
+          {/* Experience */}
+          <div className="section-title">
+            <span>💼</span>
+            Experience Details
+          </div>
+
+          <div className="experience-container">
+
+            {Array.isArray(data.experience) &&
+            data.experience.length > 0 ? (
+              data.experience.map(
+                (item, index) => (
+                  <div
+                    className="experience-item"
+                    key={index}
+                  >
+                    {typeof item === "string"
+                      ? item
+                      : JSON.stringify(item)}
+                  </div>
+                )
+              )
+            ) : (
+              <div className="empty-text">
+                No detailed experience information
+                found.
+              </div>
+            )}
+
+          </div>
+
+          {/* ================= ACTIONS ================= */}
+          <div className="resume-actions">
+
+            <button
+              className="btn btn-primary"
+              disabled={saving}
+              onClick={save}
+            >
+              {saving
+                ? "Saving..."
+                : "💾 Save Parsed Resume"}
+            </button>
+
+            {data.skills?.length > 0 && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={openSkills}
+              >
+                ⚡ Add Skills to Profile
+              </button>
+            )}
+
+            <Link
+              className="btn btn-secondary"
+              to="/skills"
+            >
+              Open Skills
+            </Link>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ================= INFO ================= */}
+      <div className="resume-info">
+
+        <div className="resume-info-title">
+          <span>💡</span>
+          How it works
+        </div>
+
+        <div className="resume-steps">
+
+          <div>
+            <span className="step-number">
+              1
+            </span>
+
+            <div>
+              <strong>
+                Upload Resume
+              </strong>
+
+              <p>
+                Upload your PDF or DOCX resume.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <span className="step-number">
+              2
+            </span>
+
+            <div>
+              <strong>
+                Extract Information
+              </strong>
+
+              <p>
+                The parser identifies your
+                profile information and skills.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <span className="step-number">
+              3
+            </span>
+
+            <div>
+              <strong>
+                Review & Save
+              </strong>
+
+              <p>
+                Review the extracted information
+                before saving it.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ================= STYLES ================= */}
+      <style>{`
+
+        .resume-page {
+          padding-bottom: 50px;
+        }
+
+        .resume-header {
+          margin-bottom: 25px;
+        }
+
+        .resume-label {
+          display: inline-block;
+          padding: 6px 10px;
+          border-radius: 7px;
+          background: #f0eaff;
+          color: #6d3df5;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 1px;
+          margin-bottom: 8px;
+        }
+
+        .resume-header h1 {
+          margin: 0 0 6px;
+          font-size: 36px;
+        }
+
+        .resume-header p {
+          margin: 0;
+          color: var(--muted);
+          font-size: 16px;
+        }
+
+        .upload-card {
+          display: flex;
+          align-items: center;
+          gap: 28px;
+          padding: 30px;
+          border: 1px solid #e7e4f5;
+          box-shadow: 0 8px 30px rgba(60,40,120,0.05);
+        }
+
+        .upload-icon {
+          width: 80px;
+          height: 80px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 20px;
+          background: #f0eaff;
+          font-size: 38px;
+        }
+
+        .upload-content {
+          flex: 1;
+        }
+
+        .upload-content h2 {
+          margin: 0 0 5px;
+          font-size: 21px;
+        }
+
+        .upload-content p {
+          color: var(--muted);
+          line-height: 1.5;
+          margin: 0 0 20px;
+          font-size: 14px;
+        }
+
+        .resume-file-input input {
+          width: 100%;
+          padding: 13px;
+          border: 1px dashed #bdb1e8;
+          border-radius: 10px;
+          background: #faf9ff;
+          cursor: pointer;
+          box-sizing: border-box;
+        }
+
+        .selected-file {
+          margin-top: 12px;
+          padding: 12px 14px;
+          border-radius: 10px;
+          background: #f7f5ff;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .selected-file strong {
+          display: block;
+          font-size: 13px;
+        }
+
+        .selected-file small {
+          display: block;
+          color: var(--muted);
+          margin-top: 2px;
+        }
+
+        .parse-button {
+          margin-top: 15px;
+        }
+
+        .button-spinner {
+          display: inline-block;
+          width: 14px;
+          height: 14px;
+          border: 2px solid rgba(255,255,255,.4);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: resume-spin .7s linear infinite;
+          margin-right: 8px;
+          vertical-align: -2px;
+        }
+
+        @keyframes resume-spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        .resume-alert {
+          margin-top: 18px;
+          display: flex;
+          align-items: center;
+          gap: 9px;
+        }
+
+        .extracted-card {
+          margin-top: 20px;
+          padding: 30px;
+        }
+
+        .extracted-header {
+          margin-bottom: 28px;
+        }
+
+        .extracted-header h2 {
+          margin: 0 0 5px;
+          font-size: 25px;
+        }
+
+        .extracted-header p {
+          color: var(--muted);
+          margin: 0;
+        }
+
+        .section-title {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          font-size: 17px;
+          font-weight: 750;
+          margin: 28px 0 14px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #ececf2;
+        }
+
+        .count-badge {
+          font-size: 11px;
+          padding: 4px 8px;
+          background: #f0eaff;
+          color: #6d3df5;
+          border-radius: 20px;
+        }
+
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 14px;
+        }
+
+        .info-box {
+          padding: 17px;
+          background: #fafbfe;
+          border: 1px solid #e8e9ef;
+          border-radius: 11px;
+        }
+
+        .info-label {
+          display: block;
+          color: #858a9b;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: .6px;
+          margin-bottom: 7px;
+        }
+
+        .info-box strong {
+          font-size: 14px;
+          color: #202438;
+          word-break: break-word;
+        }
+
+        .skills-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+          min-height: 30px;
+        }
+
+        .skill-chip {
+          padding: 8px 12px;
+          background: #f0eaff;
+          color: #6037cf;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 650;
+        }
+
+        .empty-text {
+          color: var(--muted);
+          font-size: 13px;
+        }
+
+        .experience-container {
+          display: flex;
+          flex-direction: column;
+          gap: 9px;
+        }
+
+        .experience-item {
+          padding: 13px 15px;
+          background: #fafbfe;
+          border: 1px solid #e8e9ef;
+          border-radius: 9px;
+          color: #454a5c;
+          font-size: 13px;
+          line-height: 1.5;
+        }
+
+        .resume-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 30px;
+          padding-top: 22px;
+          border-top: 1px solid #ececf2;
+        }
+
+        .resume-info {
+          margin-top: 20px;
+          padding: 22px;
+          border-radius: 14px;
+          background: #faf9ff;
+          border: 1px solid #e8e2ff;
+        }
+
+        .resume-info-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 750;
+          margin-bottom: 18px;
+        }
+
+        .resume-steps {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 15px;
+        }
+
+        .resume-steps > div {
+          display: flex;
+          gap: 10px;
+          padding: 14px;
+          background: white;
+          border: 1px solid #e9e7f2;
+          border-radius: 10px;
+        }
+
+        .step-number {
+          width: 28px;
+          height: 28px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #6d3df5;
+          color: white;
+          border-radius: 50%;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .resume-steps strong {
+          font-size: 13px;
+        }
+
+        .resume-steps p {
+          color: var(--muted);
+          font-size: 11px;
+          line-height: 1.4;
+          margin: 5px 0 0;
+        }
+
+        @media (max-width: 700px) {
+
+          .upload-card {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .info-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .resume-steps {
+            grid-template-columns: 1fr;
+          }
+
+          .extracted-card {
+            padding: 20px;
+          }
+
+        }
+
+      `}</style>
+
     </div>
   );
 }
