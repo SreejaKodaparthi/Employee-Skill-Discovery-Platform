@@ -828,9 +828,9 @@ function Skills() {
                 Resume
               </option>
 
-              <option value="endorsed">
+              {/* <option value="endorsed">
                 Endorsed
-              </option>
+              </option> */}
             </select>
           </div>
 
