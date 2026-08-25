@@ -29,7 +29,7 @@ const userRoutes = require("./routes/userRoutes");
 connectDB();
 
 const app = express();
-
+app.set('trust proxy', 1);
 /* ------------------------------------------------------------------
    CORS Configuration
 ------------------------------------------------------------------ */
