@@ -24,20 +24,48 @@
 
 // module.exports = sendEmail;
 
+// const { Resend } = require("resend");
+// const resend = new Resend(process.env.RESEND_API_KEY);
+
+// const sendEmail = async (options) => {
+//   const { error } = await resend.emails.send({
+//     from: "Employee Skill Discovery Platform <onboarding@resend.dev>",
+//     to: options.email,
+//     subject: options.subject,
+//     html: options.html,
+//   });
+
+//   if (error) {
+//     throw new Error(error.message || "Failed to send email");
+//   }
+// };
+
+// module.exports = sendEmail;
+
 const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sendEmail = async (options) => {
-  const { error } = await resend.emails.send({
-    from: "Employee Skill Discovery Platform <onboarding@resend.dev>",
-    to: options.email,
-    subject: options.subject,
-    html: options.html,
-  });
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
-  if (error) {
-    throw new Error(error.message || "Failed to send email");
+const sendEmail = async ({ to, subject, html }) => {
+  if (!resend) {
+    console.log(
+      "⚠️ RESEND_API_KEY not configured locally. Email skipped."
+    );
+
+    return {
+      success: false,
+      skipped: true,
+    };
   }
+
+  return await resend.emails.send({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject,
+    html,
+  });
 };
 
 module.exports = sendEmail;

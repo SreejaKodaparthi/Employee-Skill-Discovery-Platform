@@ -2,8 +2,7 @@
 // import { Link } from "react-router-dom";
 // import { useAuth } from "../../context/AuthContext";
 // import API from "../../services/api";
-
-// <<<<<<< HEAD
+// import { useNavigate } from "react-router-dom";
 // function Dashboard() {
 //   const navigate = useNavigate();
 //   const { logout } = useAuth();
@@ -104,6 +103,19 @@
 //     </div>
 //   </div>
 // );
+
+
+// export default  Dashboard;
+
+
+
+
+
+
+
+
+
+
 // =======
 // export default function Dashboard(){
 //   const {user}=useAuth(); const [summary,setSummary]=useState(null); const [error,setError]=useState("");

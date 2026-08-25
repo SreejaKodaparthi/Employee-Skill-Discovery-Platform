@@ -287,13 +287,13 @@ function App() {
 
             {/* ================= SKILL GAP ================= */}
 
-            <Route
+            {/* <Route
               element={
                 <ProtectedRoute
-                  roles={["manager", "hr"]}
+                  roles={["manager", "hr", "emp"]}
                 />
               }
-            >
+            > */}
 
               <Route
                 path="/skill-gap"
@@ -302,7 +302,7 @@ function App() {
 
             </Route>
 
-          </Route>
+          {/* </Route> */}
 
 
           {/* ================= 404 ================= */}

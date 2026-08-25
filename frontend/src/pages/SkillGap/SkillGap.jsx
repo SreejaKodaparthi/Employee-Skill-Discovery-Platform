@@ -314,6 +314,1294 @@
 // function Recommendation({data}){return <div>{Object.entries(data).map(([key,value])=><div key={key} style={{marginBottom:18}}><h4>{key.replace(/([A-Z])/g," $1")}</h4>{Array.isArray(value)?<div className="chips">{value.map((v,i)=><span className="chip" key={i}>{typeof v==="object"?JSON.stringify(v):String(v)}</span>)}</div>:typeof value==="object"&&value!==null?<pre style={{whiteSpace:"pre-wrap",background:"#fafbfe",padding:12,borderRadius:10,fontSize:12}}>{JSON.stringify(value,null,2)}</pre>:<p>{String(value)}</p>}</div>)}</div>}
 // >>>>>>> c6f86c44d5302f3574bf087aaff748500c9fdaca
 
+  // import { useEffect, useState } from "react";
+  // import { useSearchParams } from "react-router-dom";
+  // import API from "../../services/api";
+  // import "./SkillGap.css";
+
+  // function SkillGap() {
+  //   const [params] = useSearchParams();
+
+  //   const [user, setUser] = useState(null);
+  //   const [roles, setRoles] = useState([]);
+
+  //   const [selectedRole, setSelectedRole] = useState(
+  //     params.get("role") || ""
+  //   );
+
+  //   const [employeeId, setEmployeeId] = useState(
+  //     params.get("employee") || ""
+  //   );
+
+  //   const [analysis, setAnalysis] = useState(null);
+  //   const [recommendation, setRecommendation] = useState(null);
+
+  //   const [loadingRoles, setLoadingRoles] = useState(true);
+  //   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  //   const [error, setError] = useState("");
+
+  //   useEffect(() => {
+  //     fetchUser();
+  //     fetchRoles();
+  //   }, []);
+
+  //   const fetchUser = async () => {
+  //     try {
+  //       const res = await API.get("/auth/me");
+
+  //       setUser(res.data.user);
+
+  //       // If employee ID wasn't passed from Search,
+  //       // use the currently logged-in user.
+  //       if (!params.get("employee")) {
+  //         setEmployeeId(res.data.user._id);
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to fetch user:", err);
+
+  //       setError(
+  //         err.response?.data?.message ||
+  //           "Failed to load user information."
+  //       );
+  //     }
+  //   };
+
+  //   const fetchRoles = async () => {
+  //     try {
+  //       const res = await API.get("/roles");
+
+  //       setRoles(res.data.roles || res.data || []);
+  //     } catch (err) {
+  //       console.error(err);
+
+  //       setError(
+  //         err.response?.data?.message ||
+  //           "Failed to load roles."
+  //       );
+  //     } finally {
+  //       setLoadingRoles(false);
+  //     }
+  //   };
+
+  //   const analyzeSkillGap = async (e) => {
+  //     e?.preventDefault();
+
+  //     if (!employeeId) {
+  //       setError("Employee information could not be found.");
+  //       return;
+  //     }
+
+  //     if (!selectedRole) {
+  //       setError("Please select a target role.");
+  //       return;
+  //     }
+
+  //     try {
+  //       setLoadingAnalysis(true);
+  //       setError("");
+  //       setAnalysis(null);
+  //       setRecommendation(null);
+
+  //       // Generate skill-gap report
+  //       const res = await API.get(
+  //         `/skill-gap/${employeeId}/${selectedRole}`
+  //       );
+
+  //       setAnalysis(res.data);
+
+  //       // Get AI learning recommendation
+  //       try {
+  //         const recommendationRes = await API.get(
+  //           `/recommendations/${employeeId}/${selectedRole}`
+  //         );
+
+  //         setRecommendation(
+  //           recommendationRes.data.recommendation
+  //         );
+  //       } catch (recErr) {
+  //         // Recommendation is optional.
+  //         // Don't fail the skill-gap report if AI recommendation fails.
+  //         if (recErr.response?.status !== 404) {
+  //           console.error(
+  //             "Recommendation error:",
+  //             recErr
+  //           );
+  //         }
+  //       }
+  //     } catch (err) {
+  //       console.error(err);
+
+  //       setError(
+  //         err.response?.data?.message ||
+  //           "Failed to generate skill gap report."
+  //       );
+  //     } finally {
+  //       setLoadingAnalysis(false);
+  //     }
+  //   };
+
+  //   const getStatus = (percentage) => {
+  //     if (percentage >= 80) {
+  //       return {
+  //         className: "excellent",
+  //         text: "Excellent Match",
+  //       };
+  //     }
+
+  //     if (percentage >= 50) {
+  //       return {
+  //         className: "good",
+  //         text: "Good Match",
+  //       };
+  //     }
+
+  //     if (percentage >= 20) {
+  //       return {
+  //         className: "average",
+  //         text: "Needs Improvement",
+  //       };
+  //     }
+
+  //     return {
+  //       className: "poor",
+  //       text: "Significant Skill Gap",
+  //     };
+  //   };
+
+  //   return (
+  //     <div
+  //       className="container-page"
+  //       style={{ maxWidth: 1000 }}
+  //     >
+  //       {/* Header */}
+  //       <div className="page-head">
+  //         <h1>Skill Gap & Learning Recommendation</h1>
+
+  //         <p>
+  //           Compare an employee's current skills with
+  //           the skills required for a target role.
+  //         </p>
+  //       </div>
+
+  //       {/* Error */}
+  //       {error && (
+  //         <div className="alert alert-danger">
+  //           {error}
+  //         </div>
+  //       )}
+
+  //       {/* Role selection */}
+  //       <div className="card">
+  //         <form
+  //           onSubmit={analyzeSkillGap}
+  //           className="form-grid"
+  //         >
+  //           {/* Employee */}
+  //           <div className="field">
+  //             <label>Employee</label>
+
+  //             <input
+  //               value={
+  //                 user
+  //                   ? `${user.name} (${user.email})`
+  //                   : "Loading..."
+  //               }
+  //               disabled
+  //             />
+  //           </div>
+
+  //           {/* Role */}
+  //           <div className="field">
+  //             <label>Target Role</label>
+
+  //             <select
+  //               required
+  //               value={selectedRole}
+  //               onChange={(e) =>
+  //                 setSelectedRole(e.target.value)
+  //               }
+  //             >
+  //               <option value="">
+  //                 Select Target Role
+  //               </option>
+
+  //               {roles.map((role) => (
+  //                 <option
+  //                   key={role._id}
+  //                   value={role._id}
+  //                 >
+  //                   {role.roleName}
+  //                   {role.department
+  //                     ? ` — ${role.department}`
+  //                     : ""}
+  //                 </option>
+  //               ))}
+  //             </select>
+  //           </div>
+
+  //           <div className="field full">
+  //             <button
+  //               type="submit"
+  //               className="btn btn-primary"
+  //               disabled={
+  //                 loadingAnalysis ||
+  //                 loadingRoles ||
+  //                 !employeeId
+  //               }
+  //             >
+  //               {loadingAnalysis
+  //                 ? "Generating..."
+  //                 : "Generate Skill Gap Report"}
+  //             </button>
+  //           </div>
+  //         </form>
+  //       </div>
+
+  //       {loadingRoles && (
+  //         <p style={{ color: "var(--muted)" }}>
+  //           Loading roles...
+  //         </p>
+  //       )}
+
+  //       {/* Analysis */}
+  //       {analysis && (
+  //         <>
+  //           {/* Match card */}
+  //           <div
+  //             className="card"
+  //             style={{ marginTop: 18 }}
+  //           >
+  //             <div
+  //               style={{
+  //                 display: "flex",
+  //                 justifyContent: "space-between",
+  //                 alignItems: "center",
+  //                 gap: 20,
+  //                 flexWrap: "wrap",
+  //               }}
+  //             >
+  //               <div>
+  //                 <h2>
+  //                   {analysis.role?.roleName ||
+  //                     "Target Role"}
+  //                 </h2>
+
+  //                 <p
+  //                   style={{
+  //                     color: "var(--muted)",
+  //                   }}
+  //                 >
+  //                   Overall Match
+  //                 </p>
+  //               </div>
+
+  //               <div style={{ textAlign: "right" }}>
+  //                 <div
+  //                   style={{
+  //                     fontSize: 42,
+  //                     fontWeight: 700,
+  //                   }}
+  //                 >
+  //                   {analysis.matchPercentage}%
+  //                 </div>
+
+  //                 {(() => {
+  //                   const status = getStatus(
+  //                     analysis.matchPercentage
+  //                   );
+
+  //                   return (
+  //                     <span
+  //                       className={`status-badge ${status.className}`}
+  //                     >
+  //                       {status.text}
+  //                     </span>
+  //                   );
+  //                 })()}
+  //               </div>
+  //             </div>
+
+  //             {/* Progress */}
+  //             <div
+  //               className="progress"
+  //               style={{ marginTop: 20 }}
+  //             >
+  //               <div
+  //                 className="progress-fill"
+  //                 style={{
+  //                   width: `${Math.min(
+  //                     analysis.matchPercentage,
+  //                     100
+  //                   )}%`,
+  //                 }}
+  //               />
+  //             </div>
+
+  //             {/* Stats */}
+  //             <div
+  //               className="grid grid-3"
+  //               style={{ marginTop: 20 }}
+  //             >
+  //               <div className="card metric">
+  //                 <div className="label">
+  //                   Required Skills
+  //                 </div>
+
+  //                 <div className="value">
+  //                   {analysis.totalRequiredSkills ||
+  //                     0}
+  //                 </div>
+  //               </div>
+
+  //               <div className="card metric">
+  //                 <div className="label">
+  //                   Matched
+  //                 </div>
+
+  //                 <div className="value">
+  //                   {analysis.matchedSkills?.length ||
+  //                     0}
+  //                 </div>
+  //               </div>
+
+  //               <div className="card metric">
+  //                 <div className="label">
+  //                   Missing
+  //                 </div>
+
+  //                 <div className="value">
+  //                   {analysis.missingSkills?.length ||
+  //                     0}
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+
+  //           {/* Skills */}
+  //           <div
+  //             className="grid grid-2"
+  //             style={{ marginTop: 18 }}
+  //           >
+  //             {/* Matched */}
+  //             <div className="card">
+  //               <h3>✅ Matched Skills</h3>
+
+  //               {analysis.matchedSkills?.length ? (
+  //                 <div className="chips">
+  //                   {analysis.matchedSkills.map(
+  //                     (skill, index) => (
+  //                       <span
+  //                         className="chip green"
+  //                         key={index}
+  //                       >
+  //                         {skill}
+  //                       </span>
+  //                     )
+  //                   )}
+  //                 </div>
+  //               ) : (
+  //                 <p style={{ color: "var(--muted)" }}>
+  //                   No matched skills.
+  //                 </p>
+  //               )}
+  //             </div>
+
+  //             {/* Missing */}
+  //             <div className="card">
+  //               <h3>❌ Missing Skills</h3>
+
+  //               {analysis.missingSkills?.length ? (
+  //                 <div className="chips">
+  //                   {analysis.missingSkills.map(
+  //                     (skill, index) => (
+  //                       <span
+  //                         className="chip red"
+  //                         key={index}
+  //                       >
+  //                         {skill}
+  //                       </span>
+  //                     )
+  //                   )}
+  //                 </div>
+  //               ) : (
+  //                 <p style={{ color: "var(--muted)" }}>
+  //                   No missing skills 🎉
+  //                 </p>
+  //               )}
+  //             </div>
+  //           </div>
+
+  //           {/* Extra */}
+  //           <div
+  //             className="card"
+  //             style={{ marginTop: 18 }}
+  //           >
+  //             <h3>➕ Additional Skills</h3>
+
+  //             {analysis.extraSkills?.length ? (
+  //               <div className="chips">
+  //                 {analysis.extraSkills.map(
+  //                   (skill, index) => (
+  //                     <span
+  //                       className="chip blue"
+  //                       key={index}
+  //                     >
+  //                       {skill}
+  //                     </span>
+  //                   )
+  //                 )}
+  //               </div>
+  //             ) : (
+  //               <p style={{ color: "var(--muted)" }}>
+  //                 No additional skills.
+  //               </p>
+  //             )}
+  //           </div>
+
+  //           {/* AI Recommendation */}
+  //           <div
+  //             className="card"
+  //             style={{ marginTop: 18 }}
+  //           >
+  //             <h2>🤖 AI Learning Recommendation</h2>
+
+  //             {recommendation ? (
+  //               <Recommendation
+  //                 data={recommendation}
+  //               />
+  //             ) : analysis.aiRecommendation &&
+  //               Object.keys(
+  //                 analysis.aiRecommendation
+  //               ).length ? (
+  //               <Recommendation
+  //                 data={analysis.aiRecommendation}
+  //               />
+  //             ) : (
+  //               <p style={{ color: "var(--muted)" }}>
+  //                 No AI recommendation was returned.
+  //                 The skill-gap report is still
+  //                 available.
+  //               </p>
+  //             )}
+  //           </div>
+  //         </>
+  //       )}
+  //     </div>
+  //   );
+  // }
+
+  // function Recommendation({ data }) {
+  //   return (
+  //     <div>
+  //       {Object.entries(data).map(
+  //         ([key, value]) => (
+  //           <div
+  //             key={key}
+  //             style={{ marginBottom: 18 }}
+  //           >
+  //             <h4>
+  //               {key
+  //                 .replace(
+  //                   /([A-Z])/g,
+  //                   " $1"
+  //                 )
+  //                 .replace(/^./, (str) =>
+  //                   str.toUpperCase()
+  //                 )}
+  //             </h4>
+
+  //             {Array.isArray(value) ? (
+  //               <div className="chips">
+  //                 {value.map((item, index) => (
+  //                   <span
+  //                     className="chip"
+  //                     key={index}
+  //                   >
+  //                     {typeof item === "object"
+  //                       ? JSON.stringify(item)
+  //                       : String(item)}
+  //                   </span>
+  //                 ))}
+  //               </div>
+  //             ) : typeof value === "object" &&
+  //               value !== null ? (
+  //               <pre
+  //                 style={{
+  //                   whiteSpace: "pre-wrap",
+  //                   background: "#fafbfe",
+  //                   padding: 12,
+  //                   borderRadius: 10,
+  //                   fontSize: 12,
+  //                 }}
+  //               >
+  //                 {JSON.stringify(
+  //                   value,
+  //                   null,
+  //                   2
+  //                 )}
+  //               </pre>
+  //             ) : (
+  //               <p>{String(value)}</p>
+  //             )}
+  //           </div>
+  //         )
+  //       )}
+  //     </div>
+  //   );
+  // }
+
+  // export default SkillGap;  
+//   import { useEffect, useState } from "react";
+// import { useSearchParams } from "react-router-dom";
+// import API from "../../services/api";
+// import "./SkillGap.css";
+
+// function SkillGap() {
+//   const [params] = useSearchParams();
+
+//   const [user, setUser] = useState(null);
+//   const [roles, setRoles] = useState([]);
+
+//   const [selectedRole, setSelectedRole] = useState(
+//     params.get("role") || ""
+//   );
+
+//   const [employeeId, setEmployeeId] = useState("");
+
+//   const [analysis, setAnalysis] = useState(null);
+//   const [recommendation, setRecommendation] = useState(null);
+
+//   const [loadingUser, setLoadingUser] = useState(true);
+//   const [loadingRoles, setLoadingRoles] = useState(true);
+//   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+
+//   const [error, setError] = useState("");
+
+//   // --------------------------------------------------
+//   // Load logged-in user and roles
+//   // --------------------------------------------------
+//   useEffect(() => {
+//     fetchUser();
+//     fetchRoles();
+//   }, []);
+
+//   // --------------------------------------------------
+//   // Get currently logged-in user
+//   // --------------------------------------------------
+//   const fetchUser = async () => {
+//     try {
+//       setLoadingUser(true);
+//       setError("");
+
+//       const res = await API.get("/auth/me");
+
+//       const loggedInUser = res.data.user;
+
+//       console.log("Logged in user:", loggedInUser);
+
+//       setUser(loggedInUser);
+
+//       // IMPORTANT:
+//       // Always use the logged-in user's ID.
+//       setEmployeeId(loggedInUser._id);
+//     } catch (err) {
+//       console.error("Failed to fetch user:", err);
+
+//       setError(
+//         err.response?.data?.message ||
+//           "Failed to load user information."
+//       );
+//     } finally {
+//       setLoadingUser(false);
+//     }
+//   };
+
+//   // --------------------------------------------------
+//   // Get available roles
+//   // --------------------------------------------------
+//   const fetchRoles = async () => {
+//     try {
+//       setLoadingRoles(true);
+
+//       const res = await API.get("/roles");
+
+//       console.log("Roles:", res.data);
+
+//       setRoles(res.data.roles || res.data || []);
+//     } catch (err) {
+//       console.error("Failed to load roles:", err);
+
+//       setError(
+//         err.response?.data?.message ||
+//           "Failed to load roles."
+//       );
+//     } finally {
+//       setLoadingRoles(false);
+//     }
+//   };
+
+//   // --------------------------------------------------
+//   // Generate Skill Gap Report
+//   // --------------------------------------------------
+//   const analyzeSkillGap = async (e) => {
+//     e?.preventDefault();
+
+//     setError("");
+
+//     if (!employeeId) {
+//       setError(
+//         "Your user information could not be found. Please log in again."
+//       );
+//       return;
+//     }
+
+//     if (!selectedRole) {
+//       setError("Please select a target role.");
+//       return;
+//     }
+
+//     try {
+//       setLoadingAnalysis(true);
+
+//       setAnalysis(null);
+//       setRecommendation(null);
+
+//       console.log(
+//         "Generating skill gap:",
+//         employeeId,
+//         selectedRole
+//       );
+
+      
+
+//       // --------------------------------------------------
+//       // Generate skill-gap report
+//       // --------------------------------------------------
+
+//       console.log("ROLE:", user?.role);
+// console.log("EMPLOYEE ID:", employeeId);
+// console.log("SELECTED ROLE:", selectedRole);
+//       const res = await API.get(
+//         `/skill-gap/${employeeId}/${selectedRole}`
+//       );
+
+//       console.log("Skill gap response:", res.data);
+
+//       setAnalysis(res.data);
+
+//       // --------------------------------------------------
+//       // Get AI recommendation
+//       // --------------------------------------------------
+//       try {
+//         const recommendationRes = await API.get(
+//           `/recommendations/${employeeId}/${selectedRole}`
+//         );
+
+//         console.log(
+//           "Recommendation response:",
+//           recommendationRes.data
+//         );
+
+//         setRecommendation(
+//           recommendationRes.data.recommendation
+//         );
+//       } catch (recErr) {
+//         console.error(
+//           "Recommendation error:",
+//           recErr
+//         );
+
+//         // Recommendation is optional.
+//         // Skill-gap report should still work.
+//         if (recErr.response?.status !== 404) {
+//           console.error(
+//             "AI recommendation could not be loaded."
+//           );
+//         }
+//       }
+//     } catch (err) {
+//       console.error(
+//         "Skill gap error:",
+//         err
+//       );
+
+//       setError(
+//         err.response?.data?.message ||
+//           "Failed to generate skill gap report."
+//       );
+//     } finally {
+//       setLoadingAnalysis(false);
+//     }
+//   };
+
+//   // --------------------------------------------------
+//   // Match status
+//   // --------------------------------------------------
+//   const getStatus = (percentage) => {
+//     if (percentage >= 80) {
+//       return {
+//         className: "excellent",
+//         text: "Excellent Match",
+//       };
+//     }
+
+//     if (percentage >= 50) {
+//       return {
+//         className: "good",
+//         text: "Good Match",
+//       };
+//     }
+
+//     if (percentage >= 20) {
+//       return {
+//         className: "average",
+//         text: "Needs Improvement",
+//       };
+//     }
+
+//     return {
+//       className: "poor",
+//       text: "Significant Skill Gap",
+//     };
+//   };
+
+//   // --------------------------------------------------
+//   // Loading screen
+//   // --------------------------------------------------
+//   if (loadingUser) {
+//     return (
+//       <div
+//         className="container-page"
+//         style={{
+//           maxWidth: 1000,
+//           textAlign: "center",
+//           paddingTop: 80,
+//         }}
+//       >
+//         <p style={{ color: "var(--muted)" }}>
+//           Loading your profile...
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div
+//       className="container-page"
+//       style={{ maxWidth: 1000 }}
+//     >
+//       {/* ==================================================
+//           HEADER
+//       ================================================== */}
+
+//       <div className="page-head">
+//         <h1>
+//           Skill Gap & Learning Recommendation
+//         </h1>
+
+//         <p>
+//           Compare your current skills with the
+//           skills required for a target role.
+//         </p>
+//       </div>
+
+//       {/* ==================================================
+//           ERROR
+//       ================================================== */}
+
+//       {error && (
+//         <div className="alert alert-danger">
+//           {error}
+//         </div>
+//       )}
+
+//       {/* ==================================================
+//           SELECTION CARD
+//       ================================================== */}
+
+//       <div className="card">
+//         <form
+//           onSubmit={analyzeSkillGap}
+//           className="form-grid"
+//         >
+//           {/* ------------------------------------------------
+//               Logged-in User
+//           ------------------------------------------------ */}
+
+//           <div className="field">
+//             <label>Your Profile</label>
+
+//             <input
+//               value={
+//                 user
+//                   ? `${user.name} (${user.email})`
+//                   : "Loading..."
+//               }
+//               disabled
+//             />
+
+//             <small
+//               style={{
+//                 color: "var(--muted)",
+//                 display: "block",
+//                 marginTop: 6,
+//               }}
+//             >
+//               Skill gap analysis will use your
+//               current skills.
+//             </small>
+//           </div>
+
+//           {/* ------------------------------------------------
+//               Target Role
+//           ------------------------------------------------ */}
+
+//           <div className="field">
+//             <label>Target Role</label>
+
+//             <select
+//               required
+//               value={selectedRole}
+//               onChange={(e) => {
+//                 setSelectedRole(e.target.value);
+
+//                 // Clear previous analysis when
+//                 // target role changes.
+//                 setAnalysis(null);
+//                 setRecommendation(null);
+//                 setError("");
+//               }}
+//               disabled={loadingRoles}
+//             >
+//               <option value="">
+//                 {loadingRoles
+//                   ? "Loading roles..."
+//                   : "Select Target Role"}
+//               </option>
+
+//               {roles.map((role) => (
+//                 <option
+//                   key={role._id}
+//                   value={role._id}
+//                 >
+//                   {role.roleName}
+//                   {role.department
+//                     ? ` — ${role.department}`
+//                     : ""}
+//                 </option>
+//               ))}
+//             </select>
+//           </div>
+
+//           {/* ------------------------------------------------
+//               Generate Button
+//           ------------------------------------------------ */}
+
+//           <div className="field full">
+//             <button
+//               type="submit"
+//               className="btn btn-primary"
+//               disabled={
+//                 loadingAnalysis ||
+//                 loadingRoles ||
+//                 !employeeId ||
+//                 !selectedRole
+//               }
+//             >
+//               {loadingAnalysis
+//                 ? "Generating..."
+//                 : "Generate Skill Gap Report"}
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+
+//       {/* ==================================================
+//           LOADING ROLES
+//       ================================================== */}
+
+//       {loadingRoles && (
+//         <p
+//           style={{
+//             color: "var(--muted)",
+//             marginTop: 15,
+//           }}
+//         >
+//           Loading target roles...
+//         </p>
+//       )}
+
+//       {/* ==================================================
+//           NO ROLES
+//       ================================================== */}
+
+//       {!loadingRoles && roles.length === 0 && (
+//         <div
+//           className="alert alert-danger"
+//           style={{ marginTop: 18 }}
+//         >
+//           No target roles are available.
+//           Please ask HR to create a role requirement.
+//         </div>
+//       )}
+
+//       {/* ==================================================
+//           ANALYSIS
+//       ================================================== */}
+
+//       {analysis && (
+//         <>
+//           {/* ==================================================
+//               MATCH CARD
+//           ================================================== */}
+
+//           <div
+//             className="card"
+//             style={{ marginTop: 18 }}
+//           >
+//             <div
+//               style={{
+//                 display: "flex",
+//                 justifyContent: "space-between",
+//                 alignItems: "center",
+//                 gap: 20,
+//                 flexWrap: "wrap",
+//               }}
+//             >
+//               <div>
+//                 <h2>
+//                   {analysis.role?.roleName ||
+//                     "Target Role"}
+//                 </h2>
+
+//                 <p
+//                   style={{
+//                     color: "var(--muted)",
+//                   }}
+//                 >
+//                   Overall Match
+//                 </p>
+//               </div>
+
+//               <div
+//                 style={{
+//                   textAlign: "right",
+//                 }}
+//               >
+//                 <div
+//                   style={{
+//                     fontSize: 42,
+//                     fontWeight: 700,
+//                   }}
+//                 >
+//                   {analysis.matchPercentage || 0}%
+//                 </div>
+
+//                 {(() => {
+//                   const status = getStatus(
+//                     analysis.matchPercentage || 0
+//                   );
+
+//                   return (
+//                     <span
+//                       className={`status-badge ${status.className}`}
+//                     >
+//                       {status.text}
+//                     </span>
+//                   );
+//                 })()}
+//               </div>
+//             </div>
+
+//             {/* Progress Bar */}
+
+//             <div
+//               className="progress"
+//               style={{ marginTop: 20 }}
+//             >
+//               <div
+//                 className="progress-fill"
+//                 style={{
+//                   width: `${Math.min(
+//                     analysis.matchPercentage || 0,
+//                     100
+//                   )}%`,
+//                 }}
+//               />
+//             </div>
+
+//             {/* ==================================================
+//                 STATISTICS
+//             ================================================== */}
+
+//             <div
+//               className="grid grid-3"
+//               style={{ marginTop: 20 }}
+//             >
+//               <div className="card metric">
+//                 <div className="label">
+//                   Required Skills
+//                 </div>
+
+//                 <div className="value">
+//                   {analysis.totalRequiredSkills ||
+//                     0}
+//                 </div>
+//               </div>
+
+//               <div className="card metric">
+//                 <div className="label">
+//                   Matched
+//                 </div>
+
+//                 <div className="value">
+//                   {analysis.matchedSkills
+//                     ?.length || 0}
+//                 </div>
+//               </div>
+
+//               <div className="card metric">
+//                 <div className="label">
+//                   Missing
+//                 </div>
+
+//                 <div className="value">
+//                   {analysis.missingSkills
+//                     ?.length || 0}
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* ==================================================
+//               MATCHED + MISSING SKILLS
+//           ================================================== */}
+
+//           <div
+//             className="grid grid-2"
+//             style={{ marginTop: 18 }}
+//           >
+//             {/* Matched */}
+
+//             <div className="card">
+//               <h3>
+//                 ✅ Matched Skills
+//               </h3>
+
+//               {analysis.matchedSkills?.length ? (
+//                 <div className="chips">
+//                   {analysis.matchedSkills.map(
+//                     (skill, index) => (
+//                       <span
+//                         className="chip green"
+//                         key={index}
+//                       >
+//                         {skill}
+//                       </span>
+//                     )
+//                   )}
+//                 </div>
+//               ) : (
+//                 <p
+//                   style={{
+//                     color: "var(--muted)",
+//                   }}
+//                 >
+//                   No matched skills.
+//                 </p>
+//               )}
+//             </div>
+
+//             {/* Missing */}
+
+//             <div className="card">
+//               <h3>
+//                 ❌ Missing Skills
+//               </h3>
+
+//               {analysis.missingSkills?.length ? (
+//                 <div className="chips">
+//                   {analysis.missingSkills.map(
+//                     (skill, index) => (
+//                       <span
+//                         className="chip red"
+//                         key={index}
+//                       >
+//                         {skill}
+//                       </span>
+//                     )
+//                   )}
+//                 </div>
+//               ) : (
+//                 <p
+//                   style={{
+//                     color: "var(--muted)",
+//                   }}
+//                 >
+//                   No missing skills 🎉
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+
+//           {/* ==================================================
+//               EXTRA SKILLS
+//           ================================================== */}
+
+//           <div
+//             className="card"
+//             style={{ marginTop: 18 }}
+//           >
+//             <h3>
+//               ➕ Additional Skills
+//             </h3>
+
+//             {analysis.extraSkills?.length ? (
+//               <div className="chips">
+//                 {analysis.extraSkills.map(
+//                   (skill, index) => (
+//                     <span
+//                       className="chip blue"
+//                       key={index}
+//                     >
+//                       {skill}
+//                     </span>
+//                   )
+//                 )}
+//               </div>
+//             ) : (
+//               <p
+//                 style={{
+//                   color: "var(--muted)",
+//                 }}
+//               >
+//                 No additional skills.
+//               </p>
+//             )}
+//           </div>
+
+//           {/* ==================================================
+//               AI RECOMMENDATION
+//           ================================================== */}
+
+//           <div
+//             className="card"
+//             style={{ marginTop: 18 }}
+//           >
+//             <h2>
+//               🤖 AI Learning Recommendation
+//             </h2>
+
+//             {recommendation ? (
+//               <Recommendation
+//                 data={recommendation}
+//               />
+//             ) : analysis.aiRecommendation &&
+//               Object.keys(
+//                 analysis.aiRecommendation
+//               ).length ? (
+//               <Recommendation
+//                 data={analysis.aiRecommendation}
+//               />
+//             ) : (
+//               <p
+//                 style={{
+//                   color: "var(--muted)",
+//                 }}
+//               >
+//                 No AI recommendation was returned.
+//                 The skill-gap report is still
+//                 available.
+//               </p>
+//             )}
+//           </div>
+//         </>
+//       )}
+//     </div>
+//   );
+// }
+
+// // ==================================================
+// // AI Recommendation Component
+// // ==================================================
+
+// function Recommendation({ data }) {
+//   if (!data || typeof data !== "object") {
+//     return (
+//       <p style={{ color: "var(--muted)" }}>
+//         No recommendation available.
+//       </p>
+//     );
+//   }
+
+//   return (
+//     <div>
+//       {Object.entries(data).map(
+//         ([key, value]) => (
+//           <div
+//             key={key}
+//             style={{
+//               marginBottom: 18,
+//             }}
+//           >
+//             <h4>
+//               {key
+//                 .replace(
+//                   /([A-Z])/g,
+//                   " $1"
+//                 )
+//                 .replace(/^./, (str) =>
+//                   str.toUpperCase()
+//                 )}
+//             </h4>
+
+//             {Array.isArray(value) ? (
+//               <div className="chips">
+//                 {value.map(
+//                   (item, index) => (
+//                     <span
+//                       className="chip"
+//                       key={index}
+//                     >
+//                       {typeof item ===
+//                       "object"
+//                         ? JSON.stringify(
+//                             item
+//                           )
+//                         : String(item)}
+//                     </span>
+//                   )
+//                 )}
+//               </div>
+//             ) : typeof value === "object" &&
+//               value !== null ? (
+//               <pre
+//                 style={{
+//                   whiteSpace: "pre-wrap",
+//                   background: "#fafbfe",
+//                   padding: 12,
+//                   borderRadius: 10,
+//                   fontSize: 12,
+//                 }}
+//               >
+//                 {JSON.stringify(
+//                   value,
+//                   null,
+//                   2
+//                 )}
+//               </pre>
+//             ) : (
+//               <p>{String(value)}</p>
+//             )}
+//           </div>
+//         )
+//       )}
+//     </div>
+//   );
+// }
+
+// export default SkillGap;
+
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import API from "../../services/api";
@@ -323,122 +1611,239 @@ function SkillGap() {
   const [params] = useSearchParams();
 
   const [user, setUser] = useState(null);
-  const [roles, setRoles] = useState([]);
+  const [employeeId, setEmployeeId] = useState("");
 
+  const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState(
     params.get("role") || ""
-  );
-
-  const [employeeId, setEmployeeId] = useState(
-    params.get("employee") || ""
   );
 
   const [analysis, setAnalysis] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
 
+  const [loadingUser, setLoadingUser] = useState(true);
   const [loadingRoles, setLoadingRoles] = useState(true);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+
   const [error, setError] = useState("");
+
+  // =========================================================
+  // LOAD USER + ROLES
+  // =========================================================
 
   useEffect(() => {
     fetchUser();
     fetchRoles();
   }, []);
 
+  // =========================================================
+  // GET LOGGED-IN USER
+  // =========================================================
+
   const fetchUser = async () => {
     try {
+      setLoadingUser(true);
+      setError("");
+
       const res = await API.get("/auth/me");
 
-      setUser(res.data.user);
+      const loggedInUser = res.data.user;
 
-      // If employee ID wasn't passed from Search,
-      // use the currently logged-in user.
-      if (!params.get("employee")) {
-        setEmployeeId(res.data.user._id);
+      console.log(
+        "Skill Gap - Logged in user:",
+        loggedInUser
+      );
+
+      setUser(loggedInUser);
+
+      const id =
+        loggedInUser._id ||
+        loggedInUser.id;
+
+      if (!id) {
+        throw new Error(
+          "User ID was not found."
+        );
       }
+
+      // IMPORTANT:
+      // Every user analyzes their OWN skills.
+      setEmployeeId(id);
+
+      console.log(
+        "Skill Gap - Employee ID:",
+        id
+      );
+
     } catch (err) {
-      console.error("Failed to fetch user:", err);
+      console.error(
+        "Failed to load user:",
+        err
+      );
 
       setError(
         err.response?.data?.message ||
+          err.message ||
           "Failed to load user information."
       );
+
+    } finally {
+      setLoadingUser(false);
     }
   };
 
+  // =========================================================
+  // GET ROLES
+  // =========================================================
+
   const fetchRoles = async () => {
     try {
+      setLoadingRoles(true);
+
       const res = await API.get("/roles");
 
-      setRoles(res.data.roles || res.data || []);
+      console.log(
+        "Skill Gap - Roles:",
+        res.data
+      );
+
+      setRoles(
+        res.data.roles ||
+          res.data.data ||
+          res.data ||
+          []
+      );
+
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Failed to load roles:",
+        err
+      );
 
       setError(
         err.response?.data?.message ||
           "Failed to load roles."
       );
+
     } finally {
       setLoadingRoles(false);
     }
   };
 
+  // =========================================================
+  // GENERATE SKILL GAP
+  // =========================================================
+
   const analyzeSkillGap = async (e) => {
-    e?.preventDefault();
+    e.preventDefault();
+
+    setError("");
 
     if (!employeeId) {
-      setError("Employee information could not be found.");
+      setError(
+        "Your user information could not be found. Please log in again."
+      );
       return;
     }
 
     if (!selectedRole) {
-      setError("Please select a target role.");
+      setError(
+        "Please select a target role."
+      );
       return;
     }
 
     try {
       setLoadingAnalysis(true);
-      setError("");
+
       setAnalysis(null);
       setRecommendation(null);
 
-      // Generate skill-gap report
+      console.log(
+        "Generating skill gap:",
+        employeeId,
+        selectedRole
+      );
+
+      console.log(
+        "ROLE:",
+        user?.role
+      );
+
+      console.log(
+        "EMPLOYEE ID:",
+        employeeId
+      );
+
+      console.log(
+        "SELECTED ROLE:",
+        selectedRole
+      );
+
+      // =====================================================
+      // ONLY ONE API CALL
+      //
+      // The backend skill-gap controller already generates
+      // and returns the AI recommendation.
+      // =====================================================
+
       const res = await API.get(
         `/skill-gap/${employeeId}/${selectedRole}`
       );
 
+      console.log(
+        "Skill gap response:",
+        res.data
+      );
+
       setAnalysis(res.data);
 
-      // Get AI learning recommendation
-      try {
-        const recommendationRes = await API.get(
-          `/recommendations/${employeeId}/${selectedRole}`
-        );
+      // AI recommendation comes directly
+      // from the skill-gap API response.
+      const aiRecommendation =
+        res.data.aiRecommendation;
 
+      console.log(
+        "AI Recommendation:",
+        aiRecommendation
+      );
+
+      if (
+        aiRecommendation &&
+        typeof aiRecommendation === "object" &&
+        Object.keys(aiRecommendation).length > 0
+      ) {
         setRecommendation(
-          recommendationRes.data.recommendation
+          aiRecommendation
         );
-      } catch (recErr) {
-        // Recommendation is optional.
-        // Don't fail the skill-gap report if AI recommendation fails.
-        if (recErr.response?.status !== 404) {
-          console.error(
-            "Recommendation error:",
-            recErr
-          );
-        }
+      } else {
+        setRecommendation(null);
       }
+
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Skill gap error:",
+        err
+      );
+
+      console.error(
+        "Backend response:",
+        err.response?.data
+      );
 
       setError(
         err.response?.data?.message ||
           "Failed to generate skill gap report."
       );
+
     } finally {
       setLoadingAnalysis(false);
     }
   };
+
+  // =========================================================
+  // MATCH STATUS
+  // =========================================================
 
   const getStatus = (percentage) => {
     if (percentage >= 80) {
@@ -468,39 +1873,96 @@ function SkillGap() {
     };
   };
 
+  // =========================================================
+  // LOADING USER
+  // =========================================================
+
+  if (loadingUser) {
+    return (
+      <div
+        className="container-page"
+        style={{
+          maxWidth: 1000,
+          textAlign: "center",
+          paddingTop: 80,
+        }}
+      >
+        <p
+          style={{
+            color: "var(--muted)",
+          }}
+        >
+          Loading your profile...
+        </p>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // PAGE
+  // =========================================================
+
   return (
     <div
       className="container-page"
-      style={{ maxWidth: 1000 }}
+      style={{
+        maxWidth: 1000,
+      }}
     >
-      {/* Header */}
+
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
       <div className="page-head">
-        <h1>Skill Gap & Learning Recommendation</h1>
+        <h1>
+          Skill Gap & Learning Recommendation
+        </h1>
 
         <p>
-          Compare an employee's current skills with
+          Compare your current skills with
           the skills required for a target role.
         </p>
       </div>
 
-      {/* Error */}
+
+      {/* =====================================================
+          ERROR
+      ===================================================== */}
+
       {error && (
-        <div className="alert alert-danger">
+        <div
+          className="alert alert-danger"
+          style={{
+            marginBottom: 18,
+          }}
+        >
           {error}
         </div>
       )}
 
-      {/* Role selection */}
+
+      {/* =====================================================
+          SELECTION CARD
+      ===================================================== */}
+
       <div className="card">
+
         <form
           onSubmit={analyzeSkillGap}
           className="form-grid"
         >
-          {/* Employee */}
+
+          {/* USER */}
+
           <div className="field">
-            <label>Employee</label>
+
+            <label>
+              Your Profile
+            </label>
 
             <input
+              type="text"
               value={
                 user
                   ? `${user.name} (${user.email})`
@@ -508,21 +1970,48 @@ function SkillGap() {
               }
               disabled
             />
+
+            <small
+              style={{
+                color: "var(--muted)",
+                display: "block",
+                marginTop: 6,
+              }}
+            >
+              Skill gap analysis will use
+              your current skills.
+            </small>
+
           </div>
 
-          {/* Role */}
+
+          {/* TARGET ROLE */}
+
           <div className="field">
-            <label>Target Role</label>
+
+            <label>
+              Target Role
+            </label>
 
             <select
               required
               value={selectedRole}
-              onChange={(e) =>
-                setSelectedRole(e.target.value)
-              }
+              onChange={(e) => {
+                setSelectedRole(
+                  e.target.value
+                );
+
+                setAnalysis(null);
+                setRecommendation(null);
+                setError("");
+              }}
+              disabled={loadingRoles}
             >
+
               <option value="">
-                Select Target Role
+                {loadingRoles
+                  ? "Loading roles..."
+                  : "Select Target Role"}
               </option>
 
               {roles.map((role) => (
@@ -536,41 +2025,91 @@ function SkillGap() {
                     : ""}
                 </option>
               ))}
+
             </select>
+
           </div>
 
+
+          {/* BUTTON */}
+
           <div className="field full">
+
             <button
               type="submit"
               className="btn btn-primary"
               disabled={
                 loadingAnalysis ||
                 loadingRoles ||
-                !employeeId
+                !employeeId ||
+                !selectedRole
               }
             >
               {loadingAnalysis
                 ? "Generating..."
                 : "Generate Skill Gap Report"}
             </button>
+
           </div>
+
         </form>
+
       </div>
 
+
+      {/* =====================================================
+          LOADING ROLES
+      ===================================================== */}
+
       {loadingRoles && (
-        <p style={{ color: "var(--muted)" }}>
-          Loading roles...
+        <p
+          style={{
+            color: "var(--muted)",
+            marginTop: 15,
+          }}
+        >
+          Loading target roles...
         </p>
       )}
 
-      {/* Analysis */}
+
+      {/* =====================================================
+          NO ROLES
+      ===================================================== */}
+
+      {!loadingRoles &&
+        roles.length === 0 && (
+          <div
+            className="alert alert-danger"
+            style={{
+              marginTop: 18,
+            }}
+          >
+            No target roles are available.
+            Please ask HR to create a role
+            requirement.
+          </div>
+        )}
+
+
+      {/* =====================================================
+          ANALYSIS RESULTS
+      ===================================================== */}
+
       {analysis && (
         <>
-          {/* Match card */}
+
+          {/* =================================================
+              MATCH CARD
+          ================================================= */}
+
           <div
             className="card"
-            style={{ marginTop: 18 }}
+            style={{
+              marginTop: 18,
+            }}
           >
+
             <div
               style={{
                 display: "flex",
@@ -580,7 +2119,9 @@ function SkillGap() {
                 flexWrap: "wrap",
               }}
             >
+
               <div>
+
                 <h2>
                   {analysis.role?.roleName ||
                     "Target Role"}
@@ -593,22 +2134,30 @@ function SkillGap() {
                 >
                   Overall Match
                 </p>
+
               </div>
 
-              <div style={{ textAlign: "right" }}>
+
+              <div
+                style={{
+                  textAlign: "right",
+                }}
+              >
+
                 <div
                   style={{
                     fontSize: 42,
                     fontWeight: 700,
                   }}
                 >
-                  {analysis.matchPercentage}%
+                  {analysis.matchPercentage || 0}%
                 </div>
 
                 {(() => {
-                  const status = getStatus(
-                    analysis.matchPercentage
-                  );
+                  const status =
+                    getStatus(
+                      analysis.matchPercentage || 0
+                    );
 
                   return (
                     <span
@@ -618,76 +2167,109 @@ function SkillGap() {
                     </span>
                   );
                 })()}
+
               </div>
+
             </div>
 
-            {/* Progress */}
+
+            {/* PROGRESS BAR */}
+
             <div
               className="progress"
-              style={{ marginTop: 20 }}
+              style={{
+                marginTop: 20,
+              }}
             >
+
               <div
                 className="progress-fill"
                 style={{
                   width: `${Math.min(
-                    analysis.matchPercentage,
+                    analysis.matchPercentage || 0,
                     100
                   )}%`,
                 }}
               />
+
             </div>
 
-            {/* Stats */}
+
+            {/* STATISTICS */}
+
             <div
               className="grid grid-3"
-              style={{ marginTop: 20 }}
+              style={{
+                marginTop: 20,
+              }}
             >
+
               <div className="card metric">
+
                 <div className="label">
                   Required Skills
                 </div>
 
                 <div className="value">
-                  {analysis.totalRequiredSkills ||
-                    0}
+                  {analysis.totalRequiredSkills || 0}
                 </div>
+
               </div>
 
+
               <div className="card metric">
+
                 <div className="label">
                   Matched
                 </div>
 
                 <div className="value">
-                  {analysis.matchedSkills?.length ||
-                    0}
+                  {analysis.matchedSkills?.length || 0}
                 </div>
+
               </div>
 
+
               <div className="card metric">
+
                 <div className="label">
                   Missing
                 </div>
 
                 <div className="value">
-                  {analysis.missingSkills?.length ||
-                    0}
+                  {analysis.missingSkills?.length || 0}
                 </div>
+
               </div>
+
             </div>
+
           </div>
 
-          {/* Skills */}
+
+          {/* =================================================
+              MATCHED + MISSING
+          ================================================= */}
+
           <div
             className="grid grid-2"
-            style={{ marginTop: 18 }}
+            style={{
+              marginTop: 18,
+            }}
           >
-            {/* Matched */}
+
+            {/* MATCHED */}
+
             <div className="card">
-              <h3>✅ Matched Skills</h3>
+
+              <h3>
+                ✅ Matched Skills
+              </h3>
 
               {analysis.matchedSkills?.length ? (
+
                 <div className="chips">
+
                   {analysis.matchedSkills.map(
                     (skill, index) => (
                       <span
@@ -698,20 +2280,36 @@ function SkillGap() {
                       </span>
                     )
                   )}
+
                 </div>
+
               ) : (
-                <p style={{ color: "var(--muted)" }}>
+
+                <p
+                  style={{
+                    color: "var(--muted)",
+                  }}
+                >
                   No matched skills.
                 </p>
+
               )}
+
             </div>
 
-            {/* Missing */}
+
+            {/* MISSING */}
+
             <div className="card">
-              <h3>❌ Missing Skills</h3>
+
+              <h3>
+                ❌ Missing Skills
+              </h3>
 
               {analysis.missingSkills?.length ? (
+
                 <div className="chips">
+
                   {analysis.missingSkills.map(
                     (skill, index) => (
                       <span
@@ -722,24 +2320,45 @@ function SkillGap() {
                       </span>
                     )
                   )}
+
                 </div>
+
               ) : (
-                <p style={{ color: "var(--muted)" }}>
+
+                <p
+                  style={{
+                    color: "var(--muted)",
+                  }}
+                >
                   No missing skills 🎉
                 </p>
+
               )}
+
             </div>
+
           </div>
 
-          {/* Extra */}
+
+          {/* =================================================
+              EXTRA SKILLS
+          ================================================= */}
+
           <div
             className="card"
-            style={{ marginTop: 18 }}
+            style={{
+              marginTop: 18,
+            }}
           >
-            <h3>➕ Additional Skills</h3>
+
+            <h3>
+              ➕ Additional Skills
+            </h3>
 
             {analysis.extraSkills?.length ? (
+
               <div className="chips">
+
                 {analysis.extraSkills.map(
                   (skill, index) => (
                     <span
@@ -750,104 +2369,363 @@ function SkillGap() {
                     </span>
                   )
                 )}
+
               </div>
+
             ) : (
-              <p style={{ color: "var(--muted)" }}>
+
+              <p
+                style={{
+                  color: "var(--muted)",
+                }}
+              >
                 No additional skills.
               </p>
+
             )}
+
           </div>
 
-          {/* AI Recommendation */}
+
+          {/* =================================================
+              AI LEARNING RECOMMENDATION
+          ================================================= */}
+
           <div
             className="card"
-            style={{ marginTop: 18 }}
+            style={{
+              marginTop: 18,
+            }}
           >
-            <h2>🤖 AI Learning Recommendation</h2>
+
+            <h2>
+              🤖 AI Learning Recommendation
+            </h2>
 
             {recommendation ? (
+
               <Recommendation
                 data={recommendation}
               />
-            ) : analysis.aiRecommendation &&
-              Object.keys(
-                analysis.aiRecommendation
-              ).length ? (
-              <Recommendation
-                data={analysis.aiRecommendation}
-              />
+
             ) : (
-              <p style={{ color: "var(--muted)" }}>
-                No AI recommendation was returned.
-                The skill-gap report is still
-                available.
-              </p>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
-function Recommendation({ data }) {
-  return (
-    <div>
-      {Object.entries(data).map(
-        ([key, value]) => (
-          <div
-            key={key}
-            style={{ marginBottom: 18 }}
-          >
-            <h4>
-              {key
-                .replace(
-                  /([A-Z])/g,
-                  " $1"
-                )
-                .replace(/^./, (str) =>
-                  str.toUpperCase()
-                )}
-            </h4>
-
-            {Array.isArray(value) ? (
-              <div className="chips">
-                {value.map((item, index) => (
-                  <span
-                    className="chip"
-                    key={index}
-                  >
-                    {typeof item === "object"
-                      ? JSON.stringify(item)
-                      : String(item)}
-                  </span>
-                ))}
-              </div>
-            ) : typeof value === "object" &&
-              value !== null ? (
-              <pre
+              <div
                 style={{
-                  whiteSpace: "pre-wrap",
+                  padding: 15,
                   background: "#fafbfe",
-                  padding: 12,
                   borderRadius: 10,
-                  fontSize: 12,
                 }}
               >
-                {JSON.stringify(
-                  value,
-                  null,
-                  2
-                )}
-              </pre>
-            ) : (
-              <p>{String(value)}</p>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "var(--muted)",
+                  }}
+                >
+                  No AI learning recommendation
+                  was returned.
+                </p>
+
+                <small
+                  style={{
+                    color: "var(--muted)",
+                  }}
+                >
+                  The skill-gap analysis itself
+                  was generated successfully.
+                </small>
+              </div>
+
             )}
+
           </div>
-        )
+
+        </>
       )}
+
     </div>
   );
 }
 
-export default SkillGap;  
+
+// ============================================================
+// AI RECOMMENDATION COMPONENT
+// ============================================================
+
+function Recommendation({ data }) {
+
+  if (
+    !data ||
+    typeof data !== "object"
+  ) {
+    return (
+      <p
+        style={{
+          color: "var(--muted)",
+        }}
+      >
+        No recommendation available.
+      </p>
+    );
+  }
+
+
+  // SUMMARY
+
+  const summary = data.summary;
+
+
+  // PRIORITY SKILLS
+
+  const prioritySkills =
+    Array.isArray(data.prioritySkills)
+      ? data.prioritySkills
+      : [];
+
+
+  // LEARNING PLAN
+
+  const learningPlan =
+    Array.isArray(data.learningPlan)
+      ? data.learningPlan
+      : [];
+
+
+  // NEXT STEPS
+
+  const nextSteps =
+    Array.isArray(data.nextSteps)
+      ? data.nextSteps
+      : [];
+
+
+  return (
+    <div>
+
+      {/* SUMMARY */}
+
+      {summary && (
+        <div
+          style={{
+            marginBottom: 24,
+          }}
+        >
+
+          <h3>
+            📌 Summary
+          </h3>
+
+          <p>
+            {summary}
+          </p>
+
+        </div>
+      )}
+
+
+      {/* PRIORITY SKILLS */}
+
+      {prioritySkills.length > 0 && (
+        <div
+          style={{
+            marginBottom: 24,
+          }}
+        >
+
+          <h3>
+            🎯 Priority Skills
+          </h3>
+
+          <div className="chips">
+
+            {prioritySkills.map(
+              (skill, index) => (
+                <span
+                  className="chip"
+                  key={index}
+                >
+                  {String(skill)}
+                </span>
+              )
+            )}
+
+          </div>
+
+        </div>
+      )}
+
+
+      {/* LEARNING PLAN */}
+
+      {learningPlan.length > 0 && (
+        <div
+          style={{
+            marginBottom: 24,
+          }}
+        >
+
+          <h3>
+            📚 Learning Plan
+          </h3>
+
+          <div
+            style={{
+              display: "grid",
+              gap: 14,
+            }}
+          >
+
+            {learningPlan.map(
+              (item, index) => {
+
+                // Handle object format
+                if (
+                  typeof item === "object" &&
+                  item !== null
+                ) {
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        padding: 16,
+                        border: "1px solid #e7e7ef",
+                        borderRadius: 12,
+                        background: "#fff",
+                      }}
+                    >
+
+                      {item.skill && (
+                        <h4
+                          style={{
+                            marginTop: 0,
+                          }}
+                        >
+                          {item.skill}
+                        </h4>
+                      )}
+
+                      {item.recommendation && (
+                        <p>
+                          {item.recommendation}
+                        </p>
+                      )}
+
+                      {Array.isArray(
+                        item.resources
+                      ) &&
+                        item.resources.length > 0 && (
+                          <div>
+
+                            <strong>
+                              Suggested Resources
+                            </strong>
+
+                            <ul>
+                              {item.resources.map(
+                                (
+                                  resource,
+                                  resourceIndex
+                                ) => (
+                                  <li
+                                    key={
+                                      resourceIndex
+                                    }
+                                  >
+                                    {String(
+                                      resource
+                                    )}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+
+                          </div>
+                        )}
+
+                    </div>
+                  );
+                }
+
+                // Handle simple string format
+                return (
+                  <div
+                    key={index}
+                    style={{
+                      padding: 14,
+                      border: "1px solid #e7e7ef",
+                      borderRadius: 12,
+                    }}
+                  >
+                    {String(item)}
+                  </div>
+                );
+              }
+            )}
+
+          </div>
+
+        </div>
+      )}
+
+
+      {/* NEXT STEPS */}
+
+      {nextSteps.length > 0 && (
+        <div>
+
+          <h3>
+            🚀 Next Steps
+          </h3>
+
+          <ol>
+
+            {nextSteps.map(
+              (step, index) => (
+                <li
+                  key={index}
+                  style={{
+                    marginBottom: 8,
+                  }}
+                >
+                  {String(step)}
+                </li>
+              )
+            )}
+
+          </ol>
+
+        </div>
+      )}
+
+
+      {/* FALLBACK FOR UNKNOWN JSON */}
+
+      {!summary &&
+        prioritySkills.length === 0 &&
+        learningPlan.length === 0 &&
+        nextSteps.length === 0 && (
+
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              background: "#fafbfe",
+              padding: 15,
+              borderRadius: 10,
+              fontSize: 13,
+            }}
+          >
+            {JSON.stringify(
+              data,
+              null,
+              2
+            )}
+          </pre>
+
+        )}
+
+    </div>
+  );
+}
+
+export default SkillGap;
