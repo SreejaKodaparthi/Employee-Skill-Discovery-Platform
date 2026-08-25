@@ -265,19 +265,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../../services/api";
-import { useAuth } from "../../context/AuthContext";
 
 export default function Resume() {
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [file, setFile] = useState(null);
   const [data, setData] = useState(null);
-  const [fileName, setFileName] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
 
@@ -318,15 +313,11 @@ export default function Resume() {
 
       setData(res.data.parsedData);
 
-      setFileName(
-        res.data.fileName || file.name
-      );
-
       setMsg(
-        "Resume parsed successfully. Review the extracted information before saving."
+        "Resume parsed successfully. Review the extracted information."
       );
     } catch (err) {
-      console.error(err);
+      console.error("Resume parsing error:", err);
 
       setError(
         err.response?.data?.message ||
@@ -338,47 +329,12 @@ export default function Resume() {
   };
 
   // -----------------------------
-  // Save Parsed Resume
-  // -----------------------------
-  const save = async () => {
-    if (!data) return;
-
-    setSaving(true);
-    setError("");
-    setMsg("");
-
-    try {
-      const res = await API.post(
-        "/resume/save-parsed-resume",
-        {
-          userId: user?._id || user?.id,
-          parsedData: data,
-          resumeFileName: fileName,
-        }
-      );
-
-      setMsg(
-        `${res.data.message || "Resume saved successfully."} ${
-          res.data.addedSkillsCount || 0
-        } new resume skills added.`
-      );
-    } catch (err) {
-      console.error(err);
-
-      setError(
-        err.response?.data?.message ||
-          "Could not save parsed resume."
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // -----------------------------
-  // Open Skills
+  // Add extracted skills
   // -----------------------------
   const openSkills = () => {
-    if (!data?.skills?.length) return;
+    if (!data?.skills?.length) {
+      return;
+    }
 
     const parsedSkills = data.skills.map(
       (skill) =>
@@ -405,12 +361,6 @@ export default function Resume() {
     setData(null);
     setError("");
     setMsg("");
-
-    if (selectedFile) {
-      setFileName(selectedFile.name);
-    } else {
-      setFileName("");
-    }
   };
 
   return (
@@ -420,8 +370,10 @@ export default function Resume() {
     >
 
       {/* ================= HEADER ================= */}
+
       <div className="page-head resume-header">
         <div>
+
           <span className="resume-label">
             AI POWERED
           </span>
@@ -433,10 +385,13 @@ export default function Resume() {
             extract your profile information and
             skills.
           </p>
+
         </div>
       </div>
 
+
       {/* ================= UPLOAD CARD ================= */}
+
       <div className="card upload-card">
 
         <div className="upload-icon">
@@ -444,7 +399,10 @@ export default function Resume() {
         </div>
 
         <div className="upload-content">
-          <h2>Upload your resume</h2>
+
+          <h2>
+            Upload your resume
+          </h2>
 
           <p>
             Supported formats: PDF and DOCX
@@ -455,19 +413,30 @@ export default function Resume() {
           <form onSubmit={parse}>
 
             <div className="resume-file-input">
+
               <input
                 type="file"
                 accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 onChange={handleFileChange}
               />
+
             </div>
+
+
+            {/* Selected File */}
 
             {file && (
               <div className="selected-file">
-                <span>📎</span>
+
+                <span>
+                  📎
+                </span>
 
                 <div>
-                  <strong>{file.name}</strong>
+
+                  <strong>
+                    {file.name}
+                  </strong>
 
                   <small>
                     {(file.size / 1024 / 1024).toFixed(
@@ -475,15 +444,21 @@ export default function Resume() {
                     )}{" "}
                     MB
                   </small>
+
                 </div>
+
               </div>
             )}
+
+
+            {/* Parse Button */}
 
             <button
               type="submit"
               className="btn btn-primary parse-button"
               disabled={loading}
             >
+
               {loading ? (
                 <>
                   <span className="button-spinner"></span>
@@ -494,57 +469,94 @@ export default function Resume() {
                   🔍 Parse Resume
                 </>
               )}
+
             </button>
 
           </form>
+
         </div>
 
       </div>
 
+
       {/* ================= ERROR ================= */}
+
       {error && (
         <div className="alert alert-danger resume-alert">
-          <span>⚠️</span>
+
+          <span>
+            ⚠️
+          </span>
+
           {error}
+
         </div>
       )}
+
 
       {/* ================= SUCCESS ================= */}
+
       {msg && (
         <div className="alert alert-success resume-alert">
-          <span>✓</span>
+
+          <span>
+            ✓
+          </span>
+
           {msg}
+
         </div>
       )}
 
+
       {/* ================= EXTRACTED DATA ================= */}
+
       {data && (
         <div className="card extracted-card">
 
+          {/* Header */}
+
           <div className="extracted-header">
+
             <div>
+
               <span className="resume-label">
                 PARSED RESULT
               </span>
 
-              <h2>Extracted Information</h2>
+              <h2>
+                Extracted Information
+              </h2>
 
               <p>
                 Review the information extracted
                 from your resume.
               </p>
+
             </div>
+
           </div>
 
-          {/* Basic Information */}
+
+          {/* ================= PERSONAL INFORMATION ================= */}
+
           <div className="section-title">
-            <span>👤</span>
+
+            <span>
+              👤
+            </span>
+
             Personal Information
+
           </div>
+
 
           <div className="info-grid">
 
+            {/* Name */}
+
             <div className="info-box">
+
               <span className="info-label">
                 FULL NAME
               </span>
@@ -552,9 +564,14 @@ export default function Resume() {
               <strong>
                 {data.name || "Not found"}
               </strong>
+
             </div>
 
+
+            {/* Email */}
+
             <div className="info-box">
+
               <span className="info-label">
                 EMAIL
               </span>
@@ -562,9 +579,14 @@ export default function Resume() {
               <strong>
                 {data.email || "Not found"}
               </strong>
+
             </div>
 
+
+            {/* Phone */}
+
             <div className="info-box">
+
               <span className="info-label">
                 PHONE
               </span>
@@ -572,39 +594,60 @@ export default function Resume() {
               <strong>
                 {data.phone || "Not found"}
               </strong>
+
             </div>
 
+
+            {/* Experience */}
+
             <div className="info-box">
+
               <span className="info-label">
                 EXPERIENCE
               </span>
 
               <strong>
-                {Array.isArray(data.experience)
+
+                {Array.isArray(
+                  data.experience
+                )
                   ? data.experience.length
                     ? `${data.experience.length} entries`
                     : "Not found"
                   : data.experience ||
                     "Not found"}
+
               </strong>
+
             </div>
 
           </div>
 
-          {/* Skills */}
+
+          {/* ================= SKILLS ================= */}
+
           <div className="section-title">
-            <span>⚡</span>
+
+            <span>
+              ⚡
+            </span>
+
             Skills
+
             <span className="count-badge">
               {data.skills?.length || 0}
             </span>
+
           </div>
+
 
           <div className="skills-container">
 
             {data.skills?.length ? (
+
               data.skills.map(
                 (skill, index) => (
+
                   <span
                     className="skill-chip"
                     key={
@@ -613,73 +656,92 @@ export default function Resume() {
                         : skill.name || index
                     }
                   >
+
                     {typeof skill === "string"
                       ? skill
                       : skill.name}
+
                   </span>
+
                 )
               )
+
             ) : (
+
               <span className="empty-text">
                 No skills found
               </span>
+
             )}
 
           </div>
 
-          {/* Experience */}
+
+          {/* ================= EXPERIENCE ================= */}
+
           <div className="section-title">
-            <span>💼</span>
+
+            <span>
+              💼
+            </span>
+
             Experience Details
+
           </div>
+
 
           <div className="experience-container">
 
-            {Array.isArray(data.experience) &&
+            {Array.isArray(
+              data.experience
+            ) &&
             data.experience.length > 0 ? (
+
               data.experience.map(
                 (item, index) => (
+
                   <div
                     className="experience-item"
                     key={index}
                   >
+
                     {typeof item === "string"
                       ? item
                       : JSON.stringify(item)}
+
                   </div>
+
                 )
               )
+
             ) : (
+
               <div className="empty-text">
-                No detailed experience information
-                found.
+                No detailed experience
+                information found.
               </div>
+
             )}
 
           </div>
 
+
           {/* ================= ACTIONS ================= */}
+
           <div className="resume-actions">
 
-            <button
-              className="btn btn-primary"
-              disabled={saving}
-              onClick={save}
-            >
-              {saving
-                ? "Saving..."
-                : "💾 Save Parsed Resume"}
-            </button>
-
             {data.skills?.length > 0 && (
+
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-primary"
                 onClick={openSkills}
               >
                 ⚡ Add Skills to Profile
               </button>
+
             )}
+
 
             <Link
               className="btn btn-secondary"
@@ -693,22 +755,34 @@ export default function Resume() {
         </div>
       )}
 
-      {/* ================= INFO ================= */}
+
+      {/* ================= HOW IT WORKS ================= */}
+
       <div className="resume-info">
 
         <div className="resume-info-title">
-          <span>💡</span>
+
+          <span>
+            💡
+          </span>
+
           How it works
+
         </div>
+
 
         <div className="resume-steps">
 
+          {/* Step 1 */}
+
           <div>
+
             <span className="step-number">
               1
             </span>
 
             <div>
+
               <strong>
                 Upload Resume
               </strong>
@@ -716,15 +790,22 @@ export default function Resume() {
               <p>
                 Upload your PDF or DOCX resume.
               </p>
+
             </div>
+
           </div>
 
+
+          {/* Step 2 */}
+
           <div>
+
             <span className="step-number">
               2
             </span>
 
             <div>
+
               <strong>
                 Extract Information
               </strong>
@@ -733,31 +814,42 @@ export default function Resume() {
                 The parser identifies your
                 profile information and skills.
               </p>
+
             </div>
+
           </div>
 
+
+          {/* Step 3 */}
+
           <div>
+
             <span className="step-number">
               3
             </span>
 
             <div>
+
               <strong>
-                Review & Save
+                Review Results
               </strong>
 
               <p>
-                Review the extracted information
-                before saving it.
+                Review the information extracted
+                from your resume.
               </p>
+
             </div>
+
           </div>
 
         </div>
 
       </div>
 
+
       {/* ================= STYLES ================= */}
+
       <style>{`
 
         .resume-page {
@@ -797,18 +889,23 @@ export default function Resume() {
           gap: 28px;
           padding: 30px;
           border: 1px solid #e7e4f5;
-          box-shadow: 0 8px 30px rgba(60,40,120,0.05);
+          box-shadow:
+            0 8px 30px rgba(60,40,120,0.05);
         }
 
         .upload-icon {
           width: 80px;
           height: 80px;
           flex-shrink: 0;
+
           display: flex;
           align-items: center;
           justify-content: center;
+
           border-radius: 20px;
+
           background: #f0eaff;
+
           font-size: 38px;
         }
 
@@ -831,20 +928,29 @@ export default function Resume() {
         .resume-file-input input {
           width: 100%;
           padding: 13px;
+
           border: 1px dashed #bdb1e8;
           border-radius: 10px;
+
           background: #faf9ff;
+
           cursor: pointer;
+
           box-sizing: border-box;
         }
 
         .selected-file {
           margin-top: 12px;
+
           padding: 12px 14px;
+
           border-radius: 10px;
+
           background: #f7f5ff;
+
           display: flex;
           align-items: center;
+
           gap: 10px;
         }
 
@@ -865,26 +971,37 @@ export default function Resume() {
 
         .button-spinner {
           display: inline-block;
+
           width: 14px;
           height: 14px;
+
           border: 2px solid rgba(255,255,255,.4);
           border-top-color: white;
+
           border-radius: 50%;
-          animation: resume-spin .7s linear infinite;
+
+          animation:
+            resume-spin .7s linear infinite;
+
           margin-right: 8px;
+
           vertical-align: -2px;
         }
 
         @keyframes resume-spin {
+
           to {
             transform: rotate(360deg);
           }
+
         }
 
         .resume-alert {
           margin-top: 18px;
+
           display: flex;
           align-items: center;
+
           gap: 9px;
         }
 
@@ -910,138 +1027,211 @@ export default function Resume() {
         .section-title {
           display: flex;
           align-items: center;
+
           gap: 9px;
+
           font-size: 17px;
           font-weight: 750;
+
           margin: 28px 0 14px;
+
           padding-bottom: 10px;
-          border-bottom: 1px solid #ececf2;
+
+          border-bottom:
+            1px solid #ececf2;
         }
 
         .count-badge {
           font-size: 11px;
+
           padding: 4px 8px;
+
           background: #f0eaff;
           color: #6d3df5;
+
           border-radius: 20px;
         }
 
         .info-grid {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
+
+          grid-template-columns:
+            repeat(2, 1fr);
+
           gap: 14px;
         }
 
         .info-box {
           padding: 17px;
+
           background: #fafbfe;
-          border: 1px solid #e8e9ef;
+
+          border:
+            1px solid #e8e9ef;
+
           border-radius: 11px;
         }
 
         .info-label {
           display: block;
+
           color: #858a9b;
+
           font-size: 10px;
+
           font-weight: 800;
+
           letter-spacing: .6px;
+
           margin-bottom: 7px;
         }
 
         .info-box strong {
           font-size: 14px;
+
           color: #202438;
+
           word-break: break-word;
         }
 
         .skills-container {
           display: flex;
+
           flex-wrap: wrap;
+
           gap: 9px;
+
           min-height: 30px;
         }
 
         .skill-chip {
           padding: 8px 12px;
+
           background: #f0eaff;
+
           color: #6037cf;
+
           border-radius: 8px;
+
           font-size: 13px;
+
           font-weight: 650;
         }
 
         .empty-text {
           color: var(--muted);
+
           font-size: 13px;
         }
 
         .experience-container {
           display: flex;
+
           flex-direction: column;
+
           gap: 9px;
         }
 
         .experience-item {
           padding: 13px 15px;
+
           background: #fafbfe;
-          border: 1px solid #e8e9ef;
+
+          border:
+            1px solid #e8e9ef;
+
           border-radius: 9px;
+
           color: #454a5c;
+
           font-size: 13px;
+
           line-height: 1.5;
         }
 
         .resume-actions {
           display: flex;
+
           flex-wrap: wrap;
+
           gap: 10px;
+
           margin-top: 30px;
+
           padding-top: 22px;
-          border-top: 1px solid #ececf2;
+
+          border-top:
+            1px solid #ececf2;
         }
 
         .resume-info {
           margin-top: 20px;
+
           padding: 22px;
+
           border-radius: 14px;
+
           background: #faf9ff;
-          border: 1px solid #e8e2ff;
+
+          border:
+            1px solid #e8e2ff;
         }
 
         .resume-info-title {
           display: flex;
+
           align-items: center;
+
           gap: 8px;
+
           font-weight: 750;
+
           margin-bottom: 18px;
         }
 
         .resume-steps {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+
+          grid-template-columns:
+            repeat(3, 1fr);
+
           gap: 15px;
         }
 
         .resume-steps > div {
           display: flex;
+
           gap: 10px;
+
           padding: 14px;
+
           background: white;
-          border: 1px solid #e9e7f2;
+
+          border:
+            1px solid #e9e7f2;
+
           border-radius: 10px;
         }
 
         .step-number {
           width: 28px;
           height: 28px;
+
           flex-shrink: 0;
+
           display: flex;
+
           align-items: center;
           justify-content: center;
+
           background: #6d3df5;
+
           color: white;
+
           border-radius: 50%;
+
           font-size: 12px;
+
           font-weight: 800;
         }
 
@@ -1051,8 +1241,11 @@ export default function Resume() {
 
         .resume-steps p {
           color: var(--muted);
+
           font-size: 11px;
+
           line-height: 1.4;
+
           margin: 5px 0 0;
         }
 
@@ -1060,6 +1253,7 @@ export default function Resume() {
 
           .upload-card {
             flex-direction: column;
+
             align-items: flex-start;
           }
 
