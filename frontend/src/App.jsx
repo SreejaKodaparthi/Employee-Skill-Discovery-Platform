@@ -167,6 +167,165 @@
 // >>>>>>> c6f86c44d5302f3574bf087aaff748500c9fdaca
 // }
 
+// import { Navigate, Route, Routes } from "react-router-dom";
+
+// import Navbar from "./components/ProtectedRoute/Navbar/Navbar";
+// import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+
+// import Home from "./pages/Home/Home";
+// import Login from "./pages/Login/Login";
+// import Register from "./pages/Register/Register";
+// import Dashboard from "./pages/Dashboard/Dashboard";
+// import Profile from "./pages/Profile/Profile";
+// import Skills from "./pages/Skills/Skills";
+// import Resume from "./pages/Resume/Resume";
+
+// import Search from "./pages/Search/Search";
+// import SkillGap from "./pages/SkillGap/SkillGap";
+
+// import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+// import ResetPassword from "./pages/ResetPassword/ResetPassword";
+
+// import Certifications from "./pages/Certifications/Certifications";
+// import Analytics from "./pages/Analytics/Analytics";
+// import Roles from "./pages/Roles/Roles";
+
+// import UserManagement from "./pages/UserManagement/UserManagement";
+
+// import "./App.css";
+
+// function App() {
+//   return (
+//     <>
+//       <Navbar />
+
+//       <main className="app-shell">
+//         <Routes>
+
+//           {/* ================= PUBLIC ROUTES ================= */}
+
+//           <Route path="/" element={<Home />} />
+
+//           <Route path="/login" element={<Login />} />
+
+//           <Route path="/register" element={<Register />} />
+
+//           <Route
+//             path="/forgot-password"
+//             element={<ForgotPassword />}
+//           />
+
+//           <Route
+//             path="/reset-password/:token"
+//             element={<ResetPassword />}
+//           />
+
+
+//           {/* ================= PROTECTED ROUTES ================= */}
+
+//           <Route element={<ProtectedRoute />}>
+
+//             <Route
+//               path="/dashboard"
+//               element={<Dashboard />}
+//             />
+
+//             <Route
+//               path="/profile"
+//               element={<Profile />}
+//             />
+
+//             <Route
+//               path="/skills"
+//               element={<Skills />}
+//             />
+
+//             <Route
+//               path="/resume"
+//               element={<Resume />}
+//             />
+
+//             <Route
+//               path="/certifications"
+//               element={<Certifications />}
+//             />
+//             <Route element={<ProtectedRoute roles={["hr"]} />}>
+//   <Route
+//     path="/user-management"
+//     element={<UserManagement />}
+//   />
+// </Route>
+
+
+//             {/* ================= MANAGEMENT ROUTES ================= */}
+
+//             <Route
+//               element={
+//                 <ProtectedRoute
+//                   roles={["manager", "hr", "ld"]}
+//                 />
+//               }
+//             >
+
+//               <Route
+//                 path="/search"
+//                 element={<Search />}
+//               />
+
+//               <Route
+//                 path="/analytics"
+//                 element={<Analytics />}
+//               />
+
+//               <Route
+//                 path="/roles"
+//                 element={<Roles />}
+//               />
+
+//             </Route>
+
+
+//             {/* ================= SKILL GAP ================= */}
+
+//             {/* <Route
+//               element={
+//                 <ProtectedRoute
+//                   roles={["manager", "hr", "emp"]}
+//                 />
+//               }
+//             > */}
+
+//               <Route
+//                 path="/skill-gap"
+//                 element={<SkillGap />}
+//               />
+
+//             </Route>
+
+//           {/* </Route> */}
+
+
+//           {/* ================= 404 ================= */}
+
+//           <Route
+//             path="*"
+//             element={
+//               <Navigate
+//                 to="/"
+//                 replace
+//               />
+//             }
+//           />
+
+//         </Routes>
+//       </main>
+//     </>
+//   );
+// }
+
+// export default App;
+
+
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/ProtectedRoute/Navbar/Navbar";
@@ -205,117 +364,49 @@ function App() {
           {/* ================= PUBLIC ROUTES ================= */}
 
           <Route path="/" element={<Home />} />
-
           <Route path="/login" element={<Login />} />
-
           <Route path="/register" element={<Register />} />
-
-          <Route
-            path="/forgot-password"
-            element={<ForgotPassword />}
-          />
-
-          <Route
-            path="/reset-password/:token"
-            element={<ResetPassword />}
-          />
-
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* ================= PROTECTED ROUTES ================= */}
 
           <Route element={<ProtectedRoute />}>
 
-            <Route
-              path="/dashboard"
-              element={<Dashboard />}
-            />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/skills" element={<Skills />} />
+            <Route path="/resume" element={<Resume />} />
+            <Route path="/certifications" element={<Certifications />} />
 
-            <Route
-              path="/profile"
-              element={<Profile />}
-            />
+            {/* ================= HR ONLY ================= */}
 
-            <Route
-              path="/skills"
-              element={<Skills />}
-            />
-
-            <Route
-              path="/resume"
-              element={<Resume />}
-            />
-
-            <Route
-              path="/certifications"
-              element={<Certifications />}
-            />
             <Route element={<ProtectedRoute roles={["hr"]} />}>
-  <Route
-    path="/user-management"
-    element={<UserManagement />}
-  />
-</Route>
-
+              <Route path="/user-management" element={<UserManagement />} />
+            </Route>
 
             {/* ================= MANAGEMENT ROUTES ================= */}
 
             <Route
-              element={
-                <ProtectedRoute
-                  roles={["manager", "hr", "ld"]}
-                />
-              }
+              element={<ProtectedRoute roles={["manager", "hr", "ld"]} />}
             >
-
-              <Route
-                path="/search"
-                element={<Search />}
-              />
-
-              <Route
-                path="/analytics"
-                element={<Analytics />}
-              />
-
-              <Route
-                path="/roles"
-                element={<Roles />}
-              />
-
+              <Route path="/search" element={<Search />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/roles" element={<Roles />} />
             </Route>
 
+            {/* ================= SKILL GAP =================
+                Open to all authenticated roles. Employees/managers/L&D
+                see a self-locked report; HR additionally gets an
+                employee picker (handled inside SkillGap.jsx). */}
 
-            {/* ================= SKILL GAP ================= */}
+            <Route path="/skill-gap" element={<SkillGap />} />
 
-            {/* <Route
-              element={
-                <ProtectedRoute
-                  roles={["manager", "hr", "emp"]}
-                />
-              }
-            > */}
-
-              <Route
-                path="/skill-gap"
-                element={<SkillGap />}
-              />
-
-            </Route>
-
-          {/* </Route> */}
-
+          </Route>
 
           {/* ================= 404 ================= */}
 
-          <Route
-            path="*"
-            element={
-              <Navigate
-                to="/"
-                replace
-              />
-            }
-          />
+          <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
       </main>

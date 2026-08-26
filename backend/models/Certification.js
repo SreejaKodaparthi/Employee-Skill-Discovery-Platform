@@ -63,22 +63,22 @@ const certificationSchema = new mongoose.Schema(
       default: "manual",
     },
 
-    verificationStatus: {
-      type: String,
-      enum: ["unverified", "pending", "verified", "rejected"],
-      default: "unverified",
-    },
+    // verificationStatus: {
+    //   type: String,
+    //   enum: ["unverified", "pending", "verified", "rejected"],
+    //   default: "unverified",
+    // },
 
-    verifiedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
+    // verifiedBy: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "User",
+    //   default: null,
+    // },
 
-    verifiedAt: {
-      type: Date,
-      default: null,
-    },
+    // verifiedAt: {
+    //   type: Date,
+    //   default: null,
+    // },
   },
   {
     timestamps: true,
