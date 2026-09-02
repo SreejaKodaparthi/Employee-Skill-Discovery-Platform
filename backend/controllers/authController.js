@@ -188,7 +188,7 @@ const forgotPassword = async (req, res) => {
 
     // Send email
     await sendEmail({
-      email: user.email,
+      to: user.email,
 
       subject:
         "Password Reset - Employee Skill Discovery Platform",
